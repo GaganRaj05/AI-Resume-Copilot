@@ -3,7 +3,7 @@ import logging
 from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import init_beanie
 from app.models.User import User
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 logger = logging.getLogger(__name__)
 
 
@@ -22,10 +22,10 @@ async def startup_db(app:FastAPI):
         logger.error(f"Error: {str(e)}")
         raise e
         
-async def close_db_connection(request:Request):
+async def close_db_connection(app:FastAPI):
     try:
-        if hasattr(request.app.state, "mongo_client"):
-            request.app.state.mongo_client.close()
+        if hasattr(app.state, "mongo_client"):
+            app.state.mongo_client.close()
             logger.info("MongoDB connection closed successfully")
     except Exception as e:
         logger.error("An error occurred while closing MongoDB connection")

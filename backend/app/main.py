@@ -6,15 +6,18 @@ from app.core.logging_config import setup_logging
 from app.services.db import startup_db, close_db_connection
 from app.services.redis import init_redis_pool, close_redis_connection_pool
 from app.routes import auth
+from app.services.chroma_client import init_async_chroma_client, close_chroma_client
 setup_logging()
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
     await startup_db(app)
     await init_redis_pool(app)
+    await init_async_chroma_client(app)
     yield
-    await close_db_connection()
+    await close_db_connection(app)
     await close_redis_connection_pool(app)
+    await close_chroma_client(app)
 
 app = FastAPI(lifespan=lifespan)
 app.add_middleware(

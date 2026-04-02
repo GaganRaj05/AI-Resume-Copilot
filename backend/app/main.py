@@ -5,7 +5,10 @@ from app.core.settings import FRONTEND_URL
 from app.core.logging_config import setup_logging
 from app.services.db import startup_db, close_db_connection
 from app.services.redis import init_redis_pool, close_redis_connection_pool
-from app.routes import auth
+from app.routes import (
+    auth,
+    document
+)
 from app.services.chroma_client import init_async_chroma_client, close_chroma_client
 setup_logging()
 
@@ -28,4 +31,4 @@ app.add_middleware(
 )
 
 app.include_router(auth.router, prefix="/api/v1/auth")
-
+app.include_router(document.router, prefix = "/api/v1/docs")

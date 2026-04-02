@@ -53,7 +53,7 @@ async def upload_file(user_id:str, file: UploadFile = File(...)):
             user_id=user_id,
             doc_id=doc_id,
             file_path = str(saved_path),
-            original_filename = file.filename
+            orginal_filename = file.filename
         )
         return {"success":True, "msg":"File uploaded successfully", "data":{"doc_id":doc_id, "file_name":file.filename, "task_id":task.id}}
     except HTTPException:

@@ -2,7 +2,7 @@ import logging
 import chromadb
 from pathlib import Path
 from llama_index.core import (
-    SimplleDirectoryReader,
+    SimpleDirectoryReader,
     VectorStoreIndex,
     StorageContext,
 )
@@ -53,7 +53,7 @@ def run_pipeline(
     _emit(progress_callback, "Loading document", 15) 
     logger.info("[%s] Loading file: %s", doc_id, file_path)
     
-    reader = SimplleDirectoryReader(
+    reader = SimpleDirectoryReader(
         input_files = [str(path)],
         file_extractor = _get_file_extractor(suffix)
     )
@@ -80,7 +80,7 @@ def run_pipeline(
     logger.info("[%s] Created %d chunk(s)", doc_id, len(nodes))
 
     if not nodes:
-        raise RuntimeError("Document produced zero chunks — it may be empty or image-only.")
+        raise ValueError("Document produced zero chunks — it may be empty or image-only.")
 
     _emit(progress_callback, "Connecting to vector store", 50)
     collection = get_chroma_collection()

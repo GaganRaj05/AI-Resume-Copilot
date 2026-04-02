@@ -5,7 +5,7 @@ celery_app = Celery(
     "document_processor",
     broker = settings.CELERY_BROKER_URL,
     backend = settings.CELERY_RESULT_BACKEND,
-    include = ["tasks"]
+    include = ["app.worker.tasks.document_processing"]
 )
 
 celery_app.conf.update(

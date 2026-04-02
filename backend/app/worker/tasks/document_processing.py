@@ -2,21 +2,21 @@ import logging
 from pathlib import Path
 
 from celery import Task
-from celery_app import celery_app
-from pipeline import run_pipeline
+from app.worker.celery_app import celery_app
+from app.services.document_processing import run_pipeline
 
 logger = logging.getLogger(__name__)
 
 class ProcessDocument(Task):
-    asbstract = True
+    abstract = True
     
 @celery_app.task(
-    bin = True,
+    bind = True,
     base = ProcessDocument,
     name = "tasks.process_document",
     autoretry_for = (Exception,),
     retry_backoff = 120,
-    retry_backoff_maz = 480,
+    retry_backoff_max = 480,
     max_retries = 3,
     dont_autoretry_for = (FileNotFoundError, ValueError)
 )
@@ -25,7 +25,7 @@ def process_document(
     user_id:str,
     doc_id:str,
     file_path:str,
-    original_filename:str
+    orginal_filename:str
 ) -> dict:
     logger.info("[%s] Task started | file=%s", doc_id, file_path)
     
@@ -40,7 +40,7 @@ def process_document(
             user_id=user_id,
             doc_id = doc_id,
             file_path = file_path,
-            orginal_filename = original_filename,
+            orginal_filename = orginal_filename,
             progress_callback = _update
         )
         logger.info("[%s] Task completed | chunks=%d", doc_id, result["num_chunks"])

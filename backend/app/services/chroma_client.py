@@ -42,7 +42,7 @@ async def close_chroma_client(app:FastAPI):
     else:
         logger.error("No Chroma client to close")
     
-async def get_chroma_collection(request:Request):
+async def get_chroma_collection(name:str, request:Request):
     try:
         client = await get_async_chroma_client(request=request)
         

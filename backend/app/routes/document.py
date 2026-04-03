@@ -9,7 +9,9 @@ import uuid
 import shutil
 import logging
 from typing import Any
-
+from pypdf import PdfReader
+from app.services.resume_parser import parse_resume
+import asyncio
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -18,7 +20,15 @@ def validate_file(file:UploadFile)->None:
     suffix = Path(file.filename).suffix.lower()
     if suffix not in settings.ALLOWED_EXTENSIONS:
         raise HTTPException(status_code=422, detail={"success":False, "msg":"Unsupported file format"})
-    
+
+
+def extract_text(file_path: str) -> str:
+    reader = PdfReader(file_path)
+    text = ""
+    for page in reader.pages:
+        text += page.extract_text() or ""
+    return text
+ 
 def save_upload(user_id:str,file:UploadFile) -> tuple[str, Path]:
     doc_id = str(uuid.uuid4())
     suffix = Path(file.filename).suffix.lower()
@@ -41,19 +51,25 @@ def save_upload(user_id:str,file:UploadFile) -> tuple[str, Path]:
 async def upload_file(user_id:str, file: UploadFile = File(...)):
     try:
         validate_file(file = file)
-        doc_id, saved_path = save_upload(file=file)
+        doc_id, saved_path = save_upload(user_id=user_id, file=file)
         
+        extracted_text = await asyncio.get_event_loop().run_in_executor(None, extract_text, saved_path)
+        parsed = await parse_resume(extracted_text)
+
         document = Documents(
             user_id = user_id,
             doc_id = doc_id,
-            original_name = file.filename
+            orginal_name = file.filename,
+            parsed_resume = parsed
         )
         await document.insert()
+        
+        
         task = document_processing.process_document.delay(
             user_id=user_id,
             doc_id=doc_id,
             file_path = str(saved_path),
-            orginal_filename = file.filename
+            orginal_filename = file.filename,
         )
         return {"success":True, "msg":"File uploaded successfully", "data":{"doc_id":doc_id, "file_name":file.filename, "task_id":task.id}}
     except HTTPException:

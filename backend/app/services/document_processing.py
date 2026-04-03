@@ -83,7 +83,7 @@ def run_pipeline(
         raise ValueError("Document produced zero chunks — it may be empty or image-only.")
 
     _emit(progress_callback, "Connecting to vector store", 50)
-    collection = get_chroma_collection()
+    collection = get_chroma_collection(name=settings.CHROMA_COLLECTION)
     vector_store = ChromaVectorStore(chroma_collection=collection)
     storage_ctx = StorageContext.from_defaults(vector_store=vector_store)
     

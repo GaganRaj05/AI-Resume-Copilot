@@ -51,3 +51,7 @@ class ParsedResume(BaseModel):
     skills: List[str] = []
     experience: List[Experience] = []
     education: List[Education] = []
+    
+class TailorResumeInput(BaseModel):
+    job_description: str = Field(description="The full job description to tailor the resume against")
+    tone: str = Field(default="professional", description="Writing tone: professional | confident | concise")

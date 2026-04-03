@@ -2,7 +2,6 @@ from __future__ import annotations
 import json
 import logging
 from langchain.agents import AgentExecutor, create_tool_calling_agent
-from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import PromptTemplate, ChatPromptTemplate, MessagePlaceholder
 from langchain.tools import StructuredTool
 from langchain_openai import ChatOpenAI
@@ -50,6 +49,12 @@ job_matcher_prompt = PromptTemplate(
 job_matcher_chain = (
     job_matcher_prompt | llm | StrOutputParser() | job_matcher_retry_parser
 )
+
+tailor_resume_parser = PydanticOutputParser(pydantic_object=ParsedResume)
+tailor_resume_retry_parser = RetryWithErrorOutputParser.from_llm(
+    llm=llm, parser=tailor_resume_parser, max_retries=3
+)
+tailor_resume_chain = llm | StrOutputParser() | tailor_resume_retry_parser
 
 
 class ResumeCopilot:
@@ -122,10 +127,7 @@ class ResumeCopilot:
             if "error" in resume_data:
                 return resume_json_str
 
-            parser = PydanticOutputParser(pydantic_object=ParsedResume)
-            retry_parser = RetryWithErrorOutputParser.from_llm(
-                llm=llm, parser=parser, max_retries=3
-            )
+            
 
             messages = [
                 {"role": "system", "content": prompts.TAILOR_SYSTEM_PROMPT},
@@ -138,9 +140,8 @@ class ResumeCopilot:
                     ),
                 },
             ]
-            chain = llm | StrOutputParser() | retry_parser
 
-            response = await chain.ainvoke(messages)
+            response = await tailor_resume_chain.ainvoke(messages)
             return json.dumps(response.dict(), indent=2)
         except Exception as e:
             logger.error(
@@ -221,7 +222,6 @@ class ResumeCopilot:
         prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", prompts.TAILORING_AGENT_TEMPLATE),
-                MessagePlaceholder(variable_name="chat_history"),
                 ("human", "{input}"),
             ]
         )
@@ -232,7 +232,6 @@ class ResumeCopilot:
         return AgentExecutor(
             agent=agent,
             tools=tools,
-            memory=self.memory_manager,
             verbose=True,
             max_iterations=10,
             handle_parsing_errors=True,

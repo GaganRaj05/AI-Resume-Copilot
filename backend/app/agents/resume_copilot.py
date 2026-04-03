@@ -6,8 +6,8 @@ from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import PromptTemplate, ChatPromptTemplate, MessagePlaceholder
 from langchain.tools import StructuredTool
 from langchain_openai import ChatOpenAI
-from langchain.output_parsers import PydanticOutputParser, RetryWithErrorOutputParser
-from langchain.chains import LLMChain
+from langchain_core.output_parsers import StrOutputParser, PydanticOutputParser
+from langchain.output_parsers import RetryWithErrorOutputParser
 from app.services.chroma_client import get_chroma_collection
 from app.core import settings
 from app.schemas.document import (
@@ -54,7 +54,12 @@ class ResumeCopilot:
             {format_instructions}
             """,
         )
-        self.job_matcher_chain = LLMChain(llm=self.llm, prompt=self.job_matcher_prompt)
+        self.job_matcher_chain = ( 
+            self.job_matcher_prompt
+            | self.llm
+            | StrOutputParser()
+            | self.job_matcher_retry_parser
+        )
         self.memory_manager = ConversationBufferWindowMemory(
             memory_key=f"chat_history", k=10, return_messages=True
         )
@@ -85,22 +90,11 @@ class ResumeCopilot:
         try:
             resume_chunks = await self.vector_search(query=job_description, top_k=10)
 
-            raw_output = await self.job_matcher_chain.ainvoke(
+            return await self.job_matcher_chain.ainvoke(
                 {"resume_chunks": resume_chunks, "job_description": job_description}
             )
-            text_output = (
-    raw_output.get("text")
-    if isinstance(raw_output, dict)
-    else raw_output
-)
+            
 
-            return self.job_matcher_retry_parser.parse_with_prompt(
-                text_output,
-                self.job_matcher_prompt.format(
-                    resume_chunks=resume_chunks,
-                    job_description=job_description,
-                ),
-            )
         except Exception as e:
             logger.error(
                 f"An error occured while in job matcher routing, Error:\n{str(e)}"

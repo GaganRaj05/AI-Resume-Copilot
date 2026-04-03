@@ -24,23 +24,17 @@ from app.models.Document import Documents
 
 logger = logging.getLogger(__name__)
 
-
-class ResumeCopilot:
-    def __init__(self, user_id: str, session_id: str, doc_id: str):
-        self.user_id = user_id
-        self.doc_id = doc_id
-        self.session_id = session_id
-        self.llm = ChatOpenAI(model=settings.OPENAI_MODEL, temperature=0.3)
-        self.job_matcher_parser = PydanticOutputParser(pydantic_object=JobMatcher)
-        self.job_matcher_retry_parser = RetryWithErrorOutputParser.from_llm(
-            llm=self.llm, parser=self.job_matcher_parser, max_retries=3
-        )
-        self.job_matcher_prompt = PromptTemplate(
-            input_variables=["resume_chunks", "job_description"],
-            partial_variables={
-                "format_instructions": self.job_matcher_parser.get_format_instructions()
-            },
-            template="""
+llm = ChatOpenAI(model=settings.OPENAI_MODEL)
+job_matcher_parser = PydanticOutputParser(pydantic_object=JobMatcher)
+job_matcher_retry_parser = RetryWithErrorOutputParser.from_llm(
+    llm=llm, parser=job_matcher_parser, max_retries=3
+)
+job_matcher_prompt = PromptTemplate(
+    input_variables=["resume_chunks", "job_description"],
+    partial_variables={
+        "format_instructions": job_matcher_parser.get_format_instructions()
+    },
+    template="""
             You are a senior technical recruiter
             
             Resume Content:
@@ -52,16 +46,16 @@ class ResumeCopilot:
             Return format:
             {format_instructions}
             """,
-        )
-        self.job_matcher_chain = (
-            self.job_matcher_prompt
-            | self.llm
-            | StrOutputParser()
-            | self.job_matcher_retry_parser
-        )
-        self.memory_manager = ConversationBufferWindowMemory(
-            memory_key=f"chat_history", k=10, return_messages=True
-        )
+)
+job_matcher_chain = (
+    job_matcher_prompt | llm | StrOutputParser() | job_matcher_retry_parser
+)
+
+
+class ResumeCopilot:
+    def __init__(self, user_id: str, doc_id: str):
+        self.user_id = user_id
+        self.doc_id = doc_id
 
     async def vector_search(self, query: str, top_k: int = 5) -> str:
         try:
@@ -89,7 +83,7 @@ class ResumeCopilot:
         try:
             resume_chunks = await self.vector_search(query=job_description, top_k=10)
 
-            result = await self.job_matcher_chain.ainvoke(
+            result = await job_matcher_chain.ainvoke(
                 {"resume_chunks": resume_chunks, "job_description": job_description}
             )
             return f"""
@@ -130,7 +124,7 @@ class ResumeCopilot:
 
             parser = PydanticOutputParser(pydantic_object=ParsedResume)
             retry_parser = RetryWithErrorOutputParser.from_llm(
-                llm=self.llm, parser=parser, max_retries=3
+                llm=llm, parser=parser, max_retries=3
             )
 
             messages = [
@@ -144,7 +138,7 @@ class ResumeCopilot:
                     ),
                 },
             ]
-            chain = self.llm | StrOutputParser() | retry_parser
+            chain = llm | StrOutputParser() | retry_parser
 
             response = await chain.ainvoke(messages)
             return json.dumps(response.dict(), indent=2)
@@ -224,13 +218,15 @@ class ResumeCopilot:
             ),
         ]
 
-        prompt = ChatPromptTemplate.from_messages([
+        prompt = ChatPromptTemplate.from_messages(
+            [
                 ("system", prompts.TAILORING_AGENT_TEMPLATE),
                 MessagePlaceholder(variable_name="chat_history"),
-                ("human", "{input}")
-            ])
+                ("human", "{input}"),
+            ]
+        )
         agent = create_tool_calling_agent(
-            llm=self.llm, tools=tools, prompt=prompt.partial(user_id=self.user_id)
+            llm=llm, tools=tools, prompt=prompt.partial(user_id=self.user_id)
         )
 
         return AgentExecutor(

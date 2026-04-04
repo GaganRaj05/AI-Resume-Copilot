@@ -4,7 +4,6 @@ from pathlib import Path
 from celery import Task
 from app.worker.celery_app import celery_app
 from app.services.document_processing import run_pipeline
-
 logger = logging.getLogger(__name__)
 
 class ProcessDocument(Task):

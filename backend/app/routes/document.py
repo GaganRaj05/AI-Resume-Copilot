@@ -11,6 +11,9 @@ import logging
 from typing import Any
 from pypdf import PdfReader
 from app.services.resume_parser import parse_resume
+from app.schemas.document import ResumeTailorRequestInput, CoverLetterRequest
+from app.agents.resume_copilot import ResumeCopilot
+from app.services.resume_service import generate_cover_letter
 import asyncio
 logger = logging.getLogger(__name__)
 
@@ -97,4 +100,53 @@ def task_status(task_id: str) -> dict[str, Any]:
         raise
     except Exception as e:
         logger.error(f"An error occured while fetching task status, Error:\n{str(e)}")
-        raise e
+        raise HTTPException(status_code = 500, detail = {"success":False, "msg":"Server Error"})
+
+
+@router.post("/tailor-resume")
+async def tailor_resume(data:ResumeTailorRequestInput):
+    try:
+        copilot = ResumeCopilot(
+            user_id=data.user_id,
+            doc_id=data.doc_id,
+        )
+        result = await copilot.run(job_description=data.job_description)
+        output = result.get("output","").strip()
+        if not output:
+            steps = result.get("intermediate_steps", [])
+            if steps:
+                last_tool_output = steps[-1][1]
+                raise HTTPException(
+                    status_code = 500,
+                    detail = {
+                        "success":False,
+                        "msg":f"Agent stopped before producing the final response"
+                    }
+                )
+            raise HTTPException(
+                status_code = 500,
+                detail = {
+                    "success":False,
+                    "msg":"Agent produced no ouput"
+                }
+            )
+        return {
+            "output":output,
+            "intermediate_steps":result.get("intermediate_steps",[])
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"An error occured while tailoring the resume for {data.doc_id}, Error:\n{str(e)}")
+        raise HTTPException(status_code = 500, detail = {"success":False, "msg":"Server error"})
+    
+@router.post("/generat-cover-letter")
+async def process_cover_letter(data: CoverLetterRequest):
+    try:
+        result = await generate_cover_letter(user_id=data.user_id, document_id=data.document_id)
+        return {"success":True, "msg":"Cover Letter generated successfully","result":result} 
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"An error occured while generating cover letter, Error: {str(e)}")
+        raise HTTPException(status_code = 500, detail = {"success":False, "msg":"Server Error"})

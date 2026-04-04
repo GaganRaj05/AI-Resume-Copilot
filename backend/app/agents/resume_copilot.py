@@ -2,7 +2,7 @@ from __future__ import annotations
 import json
 import logging
 from langchain.agents import AgentExecutor, create_tool_calling_agent
-from langchain.prompts import PromptTemplate, ChatPromptTemplate, MessagePlaceholder
+from langchain.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
 from langchain.tools import StructuredTool
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser, PydanticOutputParser
@@ -105,18 +105,22 @@ class ResumeCopilot:
 
     async def fetch_resume_json(self) -> str:
         try:
-            resume_data: ParsedResume = await Documents.find_one(
-                {"user_id": self.user_id, "doc_id": self.doc_id},
-                {"_id": 0, "parsed_resume": 1},
+            doc = await Documents.find_one(
+                Documents.user_id == self.user_id,
+                Documents.doc_id == self.doc_id
             )
-            if not resume_data:
+
+            if not doc or not doc.parsed_resume:
                 return json.dumps({"error": "No parsed resume found for this document"})
-            return json.dumps(resume_data["parsed_resume"], indent=2)
+
+            return json.dumps(doc.parsed_resume.model_dump(), indent=2)
+
         except Exception as e:
             logger.error(
-                f"An error occured while fetching parsed resume details, Error:\n{str(e)}"
+                f"Error fetching parsed resume | user_id={self.user_id}, doc_id={self.doc_id} | {str(e)}",
+                exc_info=True
             )
-            raise e
+            raise
 
     async def tailor_resume_json(
         self, job_description: str, tone: str = "professional"
@@ -130,7 +134,7 @@ class ResumeCopilot:
             
 
             messages = [
-                {"role": "system", "content": prompts.TAILOR_SYSTEM_PROMPT},
+                {"role": "system", "content": prompts.TAILOR_RESUME_CHAIN_PROMPT},
                 {
                     "role": "user",
                     "content": (
@@ -142,19 +146,17 @@ class ResumeCopilot:
             ]
 
             response = await tailor_resume_chain.ainvoke(messages)
-            return json.dumps(response.dict(), indent=2)
+            return json.dumps(response.model_dump(), indent=2)
         except Exception as e:
             logger.error(
                 f"An error occured while tailoring the resume, Error: {str(e)}"
             )
             raise e
 
-    def celery_dispatch(self, task_name: str, payload: dict):
+    def celery_dispatch(self, task_name: str, payload: ParsedResume, job_description: str):
         try:
             SAFE_TASKS = {
-                "export_resume_pdf": resume_tailor.export_pdf,
-                "send_resume_email": resume_tailor.send_email,
-                "generate_cover_letter": resume_tailor.generate_cover_letter,
+                "process_tailored_resume": resume_tailor.process_tailored_resume,
             }
 
             if task_name not in SAFE_TASKS:
@@ -167,7 +169,7 @@ class ResumeCopilot:
                 )
 
             task = SAFE_TASKS[task_name].delay(
-                user_id=self.user_id, document_id=self.doc_id, payload=payload
+                user_id=self.user_id, document_id=self.doc_id, payload=payload.model_dump(), job_description =job_description
             )
             return json.dumps({"success": True, "task_id": task.id, "status": "queued"})
         except Exception as e:
@@ -215,14 +217,15 @@ class ResumeCopilot:
                     "Pass the tailored resume JSON inside `payload`."
                 ),
                 args_schema=CeleryDispatchInput,
-                func=self.celery_dispatch,  # sync – keep as func=
+                func=self.celery_dispatch,  
             ),
         ]
 
         prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", prompts.TAILORING_AGENT_TEMPLATE),
+                ("system", prompts.TAILOR_SYSTEM_PROMPT),
                 ("human", "{input}"),
+                MessagesPlaceholder(variable_name="agent_scratchpad")
             ]
         )
         agent = create_tool_calling_agent(
@@ -238,3 +241,12 @@ class ResumeCopilot:
             return_intermediate_steps=True,
             early_stopping_method="generate",
         )
+        
+    async def run(self, job_description:str):
+        try:
+            agent = self.create_agent_executor()
+            result = await agent.ainvoke({"input":job_description})
+            return result
+        except Exception as e:
+            logger.error(f"An error occured while generating agent response, Error:\n{str(e)}")
+            raise e

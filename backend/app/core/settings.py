@@ -35,3 +35,5 @@ CHROMA_PORT = os.getenv("CHROMA_PORT")
 CHROMA_COLLECTION = os.getenv("CHROMA_COLLECTION", "resumes")
 
 CHROMA_PERSIST_DIR = str(BASE_DIR/"chroma_db")
+
+os.environ["G_MESSAGES_DEBUG"] = "none"

@@ -5,10 +5,7 @@ from app.core import settings
 import logging
 
 from langchain_openai import ChatOpenAI
-from langchain.prompts import PromptTemplate
-
-from langchain_core.output_parsers import StrOutputParser, PydanticOutputParser
-from langchain.output_parsers import RetryWithErrorOutputParser
+from langchain_core.prompts import PromptTemplate
 
 logger = logging.getLogger(__name__)
 
@@ -17,29 +14,17 @@ llm = ChatOpenAI(
     temperature=0
 )
 
-extracted_resume_parser = PydanticOutputParser(
-    pydantic_object=ParsedResume
-)
+structured_llm = llm.with_structured_output(ParsedResume)
+
 
 extracted_resume_prompt = PromptTemplate(
     input_variables=["information"],
-    partial_variables={
-        "format_instructions": extracted_resume_parser.get_format_instructions(),
-    },
     template=RESUME_PARSING_PROMPT,
-)
-
-extracted_resume_retry_parser = RetryWithErrorOutputParser.from_llm(
-    llm=llm,
-    parser=extracted_resume_parser,
-    max_retries=3
 )
 
 extraction_chain = (
     extracted_resume_prompt
-    | llm
-    | StrOutputParser()
-    | extracted_resume_retry_parser
+    | structured_llm
 )
 
 async def parse_resume(resume_txt: str) -> ParsedResume:

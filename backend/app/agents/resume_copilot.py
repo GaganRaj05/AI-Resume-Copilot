@@ -1,12 +1,11 @@
 from __future__ import annotations
 import json
 import logging
-from langchain.agents import AgentExecutor, create_tool_calling_agent
-from langchain.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
-from langchain.tools import StructuredTool
+from langchain_classic.agents import create_tool_calling_agent
+from langchain_classic.agents import AgentExecutor
+from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
+from langchain_classic.tools import StructuredTool
 from langchain_openai import ChatOpenAI
-from langchain_core.output_parsers import StrOutputParser, PydanticOutputParser
-from langchain.output_parsers import RetryWithErrorOutputParser
 from app.services.chroma_client import get_chroma_collection
 from app.core import settings
 from app.schemas.document import (
@@ -18,21 +17,15 @@ from app.schemas.document import (
     TailorResumeInput,
 )
 from app.agents import prompts
-from app.worker.tasks import resume_tailor
+from app.worker.tasks import resume_tasks
 from app.models.Document import Documents
 
 logger = logging.getLogger(__name__)
 
 llm = ChatOpenAI(model=settings.OPENAI_MODEL)
-job_matcher_parser = PydanticOutputParser(pydantic_object=JobMatcher)
-job_matcher_retry_parser = RetryWithErrorOutputParser.from_llm(
-    llm=llm, parser=job_matcher_parser, max_retries=3
-)
+job_matcher_llm = llm.with_structured_output(JobMatcher)
 job_matcher_prompt = PromptTemplate(
     input_variables=["resume_chunks", "job_description"],
-    partial_variables={
-        "format_instructions": job_matcher_parser.get_format_instructions()
-    },
     template="""
             You are a senior technical recruiter
             
@@ -42,20 +35,25 @@ job_matcher_prompt = PromptTemplate(
             Job Description:
             {job_description}
             
-            Return format:
-            {format_instructions}
+            Return JSON as per the schema.
             """,
 )
 job_matcher_chain = (
-    job_matcher_prompt | llm | StrOutputParser() | job_matcher_retry_parser
+    job_matcher_prompt | job_matcher_llm
 )
+tailor_resume_llm_structured = llm.with_structured_output(ParsedResume)
 
-tailor_resume_parser = PydanticOutputParser(pydantic_object=ParsedResume)
-tailor_resume_retry_parser = RetryWithErrorOutputParser.from_llm(
-    llm=llm, parser=tailor_resume_parser, max_retries=3
+tailor_resume_prompt = ChatPromptTemplate.from_messages([
+    ("system", prompts.TAILOR_RESUME_CHAIN_PROMPT),
+    ("human", "Tone: {tone}\n\nJob Description:\n{job_description}\n\nResume JSON:\n{resume_json}"),
+])
+
+
+
+tailor_resume_chain = (
+    tailor_resume_prompt
+    | tailor_resume_llm_structured
 )
-tailor_resume_chain = llm | StrOutputParser() | tailor_resume_retry_parser
-
 
 class ResumeCopilot:
     def __init__(self, user_id: str, doc_id: str):
@@ -130,22 +128,12 @@ class ResumeCopilot:
             resume_data = json.loads(resume_json_str)
             if "error" in resume_data:
                 return resume_json_str
-
             
-
-            messages = [
-                {"role": "system", "content": prompts.TAILOR_RESUME_CHAIN_PROMPT},
-                {
-                    "role": "user",
-                    "content": (
-                        f"Tone: {tone}\n\n"
-                        f"Job Description:\n{job_description}\n\n"
-                        f"Resume JSON:\n{json.dumps(resume_data, indent=2)}"
-                    ),
-                },
-            ]
-
-            response = await tailor_resume_chain.ainvoke(messages)
+            response = await tailor_resume_chain.ainvoke({
+                "tone":tone,
+                "job_description":job_description,
+                "resume_json":json.dumps(resume_data, indent=2)
+            })
             return json.dumps(response.model_dump(), indent=2)
         except Exception as e:
             logger.error(
@@ -156,7 +144,7 @@ class ResumeCopilot:
     def celery_dispatch(self, task_name: str, payload: ParsedResume, job_description: str):
         try:
             SAFE_TASKS = {
-                "process_tailored_resume": resume_tailor.process_tailored_resume,
+                "process_tailored_resume": resume_tasks.process_tailored_resume,
             }
 
             if task_name not in SAFE_TASKS:

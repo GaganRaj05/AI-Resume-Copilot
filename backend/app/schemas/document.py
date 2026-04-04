@@ -63,7 +63,7 @@ class TailorResumeInput(BaseModel):
 class ResumeTailorRequestInput(BaseModel):
     user_id:str =Field(..., description = "User id of the user")
     doc_id:str =Field(..., description = "Current resume id not to be refactored")
-    job_description = Field(..., description="Job description of the job post")
+    job_description:str = Field(..., description="Job description of the job post")
     
 class CoverLetter(BaseModel):
     cover_letter:str

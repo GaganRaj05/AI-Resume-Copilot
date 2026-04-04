@@ -4,7 +4,8 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import init_beanie
 from app.models import(
     User,
-    Document
+    Document,
+    TailoredResume
 )
 from fastapi import FastAPI
 logger = logging.getLogger(__name__)
@@ -17,7 +18,8 @@ async def startup_db(app:FastAPI):
             database= app.state.mongo_client[MONGODB_NAME],
             document_models= [
                 User.User,
-                Document.Documents
+                Document.Documents,
+                TailoredResume.TailoredResumes
             ]
         )
         logger.info("MongoDB connection successful")

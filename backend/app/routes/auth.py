@@ -104,7 +104,7 @@ async def sign_up(data:UserSignUp):
         raise
     except Exception as e:
         logger.error(f"An error occured in signup route, Error:\n{str(e)}")
-        raise HTTPException(status_code=500, detail={"success":False, "msg":"Server"})
+        raise HTTPException(status_code=500, detail={"success":False, "msg":"Server Error"})
     
 @router.post("/google-auth")
 async def google_auth(data:GoogleAuth, response:Response):

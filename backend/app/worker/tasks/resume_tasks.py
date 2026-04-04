@@ -1,5 +1,4 @@
 from celery import Task, shared_task, group
-from app.worker.celery_app import celery_app
 from app.services.resume_service import send_tailored_resume, save_tailored_resume
 import logging
 import asyncio
@@ -12,7 +11,7 @@ logger = logging.getLogger(__name__)
     retry_backoff = 120,
     retry_backoff_max = 480,
     max_retries = 3,
-    dont_autoretry_for = (ValueError)
+    dont_autoretry_for = (ValueError, )
 )
 def process_tailored_resume(self, user_id:str, document_id:str, payload:dict, job_description:str):
     try:

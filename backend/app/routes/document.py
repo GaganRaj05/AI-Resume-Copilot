@@ -41,7 +41,7 @@ def save_upload(user_id:str,file:UploadFile) -> tuple[str, Path]:
         shutil.copyfileobj(file.file, out)
     
     size = dest.stat().st_size
-    if size > settings.MAX_FILE_SIZE_BYTES:
+    if size > settings.MAX_FILE_BYTES:
         dest.unlink(missing_ok=True)
         raise HTTPException(
             status_code=413,
@@ -62,7 +62,7 @@ async def upload_file(user_id:str, file: UploadFile = File(...)):
         document = Documents(
             user_id = user_id,
             doc_id = doc_id,
-            orginal_name = file.filename,
+            original_name = file.filename,
             parsed_resume = parsed
         )
         await document.insert()
@@ -72,7 +72,7 @@ async def upload_file(user_id:str, file: UploadFile = File(...)):
             user_id=user_id,
             doc_id=doc_id,
             file_path = str(saved_path),
-            orginal_filename = file.filename,
+            original_filename = file.filename,
         )
         return {"success":True, "msg":"File uploaded successfully", "data":{"doc_id":doc_id, "file_name":file.filename, "task_id":task.id}}
     except HTTPException:

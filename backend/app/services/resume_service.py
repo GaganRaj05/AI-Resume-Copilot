@@ -3,9 +3,7 @@ import logging
 import json
 from datetime import datetime
 
-from langchain.core.output_parsers import PydanticOutputParser, StrOutputParser
-from langchain.output_parsers import RetryWithErrorOutputParser
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 
 from jinja2 import Environment, FileSystemLoader
@@ -24,15 +22,11 @@ logger = logging.getLogger(__name__)
 
 llm = ChatOpenAI(model=settings.OPENAI_MODEL, temperature = 0)
 
-cover_letter_parser = PydanticOutputParser(
-    pydantic_object = CoverLetter
-)
+cover_letter_structured = llm.with_structured_output(CoverLetter)
 
 cover_letter_generation_prompt = PromptTemplate(
     input_variables = ["parsed_resume", "job_description"],
-    partial_variables = {
-        "format_instructions":cover_letter_parser.get_format_instructions(),
-    },
+    
     template = """
     You are Cover Letter Generator.
     
@@ -44,9 +38,7 @@ cover_letter_generation_prompt = PromptTemplate(
     Job Description:
     {job_description}
     
-    Return Strict JSON with schema:
-    {format_instructions}
-    
+    Return Strict JSON as per the schema
     Rules
     - Do not hallucinate
     - If missing, return None
@@ -56,17 +48,10 @@ cover_letter_generation_prompt = PromptTemplate(
 )
 
 
-cover_letter_retry_parser = RetryWithErrorOutputParser.from_llm(
-    llm = llm,
-    parser = cover_letter_parser,
-    max_iterations = 3,
-)
 
 cover_letter_generator_chain = (
     cover_letter_generation_prompt
-    | llm
-    | StrOutputParser()
-    | cover_letter_retry_parser
+    | cover_letter_structured
 )
 
 

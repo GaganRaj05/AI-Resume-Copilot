@@ -7,11 +7,9 @@ from llama_index.core import (
     StorageContext,
 )
 from llama_index.core.node_parser import SentenceSplitter
-from llama_index.embeddings.openai import OpenAIEmbedding
-from llama_index.llms.openai import OpenAI
 from llama_index.vector_stores.chroma import ChromaVectorStore
 from app.core import settings
-from app.services.chroma_client import get_chroma_collection
+from app.services.chroma_client import get_chroma_collection_sync
 from app.core.config import configure_llama
 from app.schemas.document import DocumentProcessing
 from llama_index.readers.file import PDFReader, DocxReader
@@ -73,7 +71,7 @@ def run_pipeline(
     splitter = SentenceSplitter(
         chunk_size = settings.CHUNK_SIZE,
         chunk_overlap = settings.CHUNK_OVERLAP,
-        paragraph_seperator = "\n\n"
+        paragraph_separator = "\n\n"
     )        
     nodes = splitter.get_nodes_from_documents(documents)
     
@@ -83,7 +81,7 @@ def run_pipeline(
         raise ValueError("Document produced zero chunks — it may be empty or image-only.")
 
     _emit(progress_callback, "Connecting to vector store", 50)
-    collection = get_chroma_collection(name=settings.CHROMA_COLLECTION)
+    collection = get_chroma_collection_sync(name=settings.CHROMA_COLLECTION)
     vector_store = ChromaVectorStore(chroma_collection=collection)
     storage_ctx = StorageContext.from_defaults(vector_store=vector_store)
     

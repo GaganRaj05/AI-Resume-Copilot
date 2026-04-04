@@ -1,4 +1,4 @@
-from chromadb import AsyncHttpClient
+from chromadb import AsyncHttpClient, HttpClient
 import logging
 from fastapi import FastAPI, Request
 from app.core.settings import CHROMA_HOST, CHROMA_PORT, CHROMA_COLLECTION
@@ -14,7 +14,7 @@ async def init_async_chroma_client(app:FastAPI):
         await app.state.chroma_client.heartbeat()
         logger.info(f"Chroma client iniitialised successfully")
     except Exception as e:
-        logger(f"An error occured while initialising chroma client, Error:\n{str(e)}")
+        logger.error(f"An error occured while initialising chroma client, Error:\n{str(e)}")
         raise e
         
 
@@ -54,3 +54,19 @@ async def get_chroma_collection(name:str, request:Request):
         logger.error(f"An error occured while accessing chroma collection, Error:\n{str(e)}")
         raise e
     
+    
+#sync client for celery
+def get_chroma_collection_sync(name:str):
+    try:
+        client = HttpClient(
+            host = CHROMA_HOST,
+            port = CHROMA_PORT
+        )
+        client.heartbeat()
+        collection = client.get_or_create_collection(name=name)
+        
+        logger.info(f"Successfully got/created collection: {name}")
+        return collection
+    except Exception as e:
+        logger.error(f"An error occcured while accessing chromadb collection")
+        raise e

@@ -6,8 +6,7 @@ Extract structured information from the resume.
 Information:
 {information}
 
-Return STRICT JSON with this schema:
-{format_instructions}
+Return STRICT JSON according to the schema
 
 Rules:
 - Do NOT hallucinate

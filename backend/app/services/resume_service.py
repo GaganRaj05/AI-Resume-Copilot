@@ -11,6 +11,7 @@ from weasyprint import HTML
 import os
 import tempfile
 from pymongo import ReturnDocument
+from beanie import PydanticObjectId
 
 
 from app.models.User import User
@@ -83,7 +84,7 @@ async def send_tailored_resume(user_id: str, payload: dict):
         if not user_id or not payload:
             raise ValueError("User Id or Payload is None")
         
-        user = await User.find_one({"_id":ObjectId(user_id)}) 
+        user = await User.find_one({User.id == PydanticObjectId(user_id)})
         if not user:
             raise Exception("No user found")
         generated_pdf = await generate_pdf(payload=payload)
@@ -99,38 +100,45 @@ async def save_tailored_resume(user_id: str, document_id: str, payload: dict, jo
 
         parsed_resume_obj = ParsedResume.model_validate(payload)
 
-        await TailoredResumes.find_one_and_update(
-            {
-                "user_id": user_id,
-                "document_id": document_id
-            },
-            {
-                "$set": {
-                    "parsed_resume": parsed_resume_obj,
-                    "job_description": job_description
-                },
-                "$setOnInsert": {
-                    "user_id": user_id,
-                    "document_id": document_id,
-                    "file_name": "resume.pdf"
-                }
-            },
-            upsert=True,
-            return_document=ReturnDocument.AFTER
-        )
+        existing = await TailoredResumes.find_one({
+            "user_id": user_id,
+            "document_id": document_id
+        })
+
+        if existing:
+            existing.parsed_resume = parsed_resume_obj
+            existing.job_description = job_description
+            existing.updated_at = datetime.utcnow()
+            await existing.save()
+            result = existing
+        else:
+            result = TailoredResumes(
+                user_id=user_id,
+                document_id=document_id,
+                file_name="resume.pdf",
+                parsed_resume=parsed_resume_obj,
+                job_description=job_description,
+                created_at=datetime.utcnow(),
+                updated_at=datetime.utcnow()
+            )
+            await result.insert()
 
         logger.info(f"Resume upserted successfully | user_id={user_id}")
+        return result
 
     except Exception as e:
-        logger.error(
-            f"Error saving resume | user_id={user_id} | {str(e)}",
-            exc_info=True
-        )
+        logger.error(f"Error saving resume | user_id={user_id} | {str(e)}", exc_info=True)
         raise
-        
+          
 async def generate_cover_letter(user_id:str, document_id:str):
     try:
-        parsed_resume = await TailoredResumes.find_one({"user_id":user_id, "document_id": document_id})
+        if not user_id or not document_id:
+            raise ValueError("User Id or Payload is None")
+
+        parsed_resume = await TailoredResumes.find_one({
+            "user_id": user_id,
+            "document_id": document_id
+        })
         if not parsed_resume:
             raise Exception("No resume found")
         result = await cover_letter_generator_chain.ainvoke({

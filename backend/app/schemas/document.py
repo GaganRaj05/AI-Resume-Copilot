@@ -41,10 +41,8 @@ class ParsedResume(BaseModel):
     experience: List[Experience] = []
     education: List[Education] = []
 class CeleryDispatchInput(BaseModel):
-    task_name: str = Field(..., description="Celery task to dispatch, e.g. export_resume_pdf")
-    payload: ParsedResume = Field(default_factory=dict)
-    job_description:str = Field(..., description = "Contains job description required to create cover letters")
-    
+    task_name: str = Field(..., description="Celery task to dispatch, e.g. process_tailored_resume")
+    payload: ParsedResume = Field(..., description="The tailored resume object to process")
 class JobMatcher(BaseModel):
     match_score:int = Field(..., description="Job Match score range between 0-100")
     matched_skills:List[str] =Field(..., description="List of matched skills from user's resume that matches the job description.")
@@ -57,13 +55,12 @@ class JobMatcher(BaseModel):
 
     
 class TailorResumeInput(BaseModel):
-    job_description: str = Field(description="The full job description to tailor the resume against")
     tone: str = Field(default="professional", description="Writing tone: professional | confident | concise")
 
 class ResumeTailorRequestInput(BaseModel):
     user_id:str =Field(..., description = "User id of the user")
+    job_description:str = Field(...)
     doc_id:str =Field(..., description = "Current resume id not to be refactored")
-    job_description:str = Field(..., description="Job description of the job post")
     
 class CoverLetter(BaseModel):
     cover_letter:str

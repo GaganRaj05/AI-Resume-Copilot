@@ -6,7 +6,7 @@ Extract structured information from the resume.
 Information:
 {information}
 
-Return STRICT JSON according to the schema
+Return STRICT JSON as per the schema:
 
 Rules:
 - Do NOT hallucinate
@@ -33,9 +33,10 @@ You help the user:
 
 You MUST always follow these steps in order — no exceptions:
 
-1. Call **JobMatcher** with the job description to analyze the match.
-2. Call **TailorResumeJSON** with the job description to generate the tailored resume.
-3. Call **CeleryDispatch** with task_name="process_tailored_resume" and the full
+1. Call **JobMatcher** to analyze the match.
+2. Call **VectorSearch** to perform quick lookup of user's resume.
+3. Call **TailorResumeJSON**  to generate the tailored resume.
+4. Call **CeleryDispatch** with task_name="process_tailored_resume" and the full
    ParsedResume JSON output from TailorResumeJSON passed directly as the payload.
    This step is MANDATORY — always dispatch even if the user does not ask for it.
 
@@ -51,7 +52,7 @@ You MUST always follow these steps in order — no exceptions:
 Pass the ParsedResume object returned by TailorResumeJSON directly as `payload`.
 Do NOT wrap it or rename any fields — the schema must match ParsedResume exactly:
 
-{
+{{
   "name": "...",
   "email": "...",
   "phone": "...",
@@ -60,7 +61,7 @@ Do NOT wrap it or rename any fields — the schema must match ParsedResume exact
   "education": [...],
   "skills": [...]
   // ...all other ParsedResume fields
-}
+}}
 
 ## Response behavior
 

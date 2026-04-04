@@ -1,12 +1,24 @@
 from __future__ import annotations
 import json
 import logging
+from fastapi import Request
 from langchain_classic.agents import create_tool_calling_agent
 from langchain_classic.agents import AgentExecutor
-from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts import (
+    PromptTemplate,
+    ChatPromptTemplate,
+    MessagesPlaceholder,
+)
 from langchain_classic.tools import StructuredTool
 from langchain_openai import ChatOpenAI
-from app.services.chroma_client import get_chroma_collection
+
+from llama_index.core import VectorStoreIndex
+from llama_index.vector_stores.chroma import ChromaVectorStore
+from llama_index.core import StorageContext
+from llama_index.core.vector_stores import MetadataFilters, ExactMatchFilter, FilterCondition
+
+
+from app.services.chroma_client import get_chroma_collection_sync
 from app.core import settings
 from app.schemas.document import (
     JobMatcher,
@@ -25,56 +37,79 @@ logger = logging.getLogger(__name__)
 llm = ChatOpenAI(model=settings.OPENAI_MODEL)
 job_matcher_llm = llm.with_structured_output(JobMatcher)
 job_matcher_prompt = PromptTemplate(
-    input_variables=["resume_chunks", "job_description"],
+    input_variables=["Resume", "job_description"],
     template="""
-            You are a senior technical recruiter
+            You are a senior technical recruiter currently analysing the user's resume against the job description.
             
             Resume Content:
-            {resume_chunks}
+            {Resume}
             
             Job Description:
             {job_description}
-            
+                        
             Return JSON as per the schema.
             """,
 )
-job_matcher_chain = (
-    job_matcher_prompt | job_matcher_llm
-)
+job_matcher_chain = job_matcher_prompt | job_matcher_llm
 tailor_resume_llm_structured = llm.with_structured_output(ParsedResume)
 
-tailor_resume_prompt = ChatPromptTemplate.from_messages([
-    ("system", prompts.TAILOR_RESUME_CHAIN_PROMPT),
-    ("human", "Tone: {tone}\n\nJob Description:\n{job_description}\n\nResume JSON:\n{resume_json}"),
-])
-
-
-
-tailor_resume_chain = (
-    tailor_resume_prompt
-    | tailor_resume_llm_structured
+tailor_resume_prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", prompts.TAILOR_RESUME_CHAIN_PROMPT),
+        (
+            "human",
+            "Tone: {tone}\n\nJob Description:\n{job_description}\n\nResume JSON:\n{resume_json}",
+        ),
+    ]
 )
+
+
+tailor_resume_chain = tailor_resume_prompt | tailor_resume_llm_structured
+
+from pydantic import BaseModel
+class NoInput(BaseModel):
+    pass
 
 class ResumeCopilot:
     def __init__(self, user_id: str, doc_id: str):
         self.user_id = user_id
         self.doc_id = doc_id
+        self.job_description = ""
+        
 
     async def vector_search(self, query: str, top_k: int = 5) -> str:
         try:
-            resume_collection = await get_chroma_collection(
+            resume_collection = get_chroma_collection_sync(
                 name=settings.CHROMA_COLLECTION
             )
-            results = await resume_collection.query(
-                query_texts=[query],
-                n_results=top_k,
-                where={"user_id": self.user_id, "document_id": self.doc_id},
+            vector_store = ChromaVectorStore(chroma_collection=resume_collection)
+            storage_context = StorageContext.from_defaults(vector_store=vector_store)
+
+            index = VectorStoreIndex.from_vector_store(
+                vector_store, 
+                storage_context=storage_context
             )
-            docs = results.get("documents", [])
-            chunks = docs[0] if docs else []
-            if not chunks or len(chunks) == 0:
+            filters = MetadataFilters(
+                            filters=[
+                                ExactMatchFilter(key="user_id", value=self.user_id),
+                                ExactMatchFilter(key="document_id", value=self.doc_id),
+                            ],
+                            condition=FilterCondition.AND
+                        )
+
+
+            retriever = index.as_retriever(
+                        similarity_top_k=top_k,
+                        filters=filters
+                    )
+
+            nodes = retriever.retrieve(query)
+
+            if not nodes:
                 return "No resume content found for this user"
 
+            chunks = [node.node.get_content() for node in nodes]
+        
             return "\n\n---\n\n".join(
                 f"[Chunk {i+1}]\n{c}" for i, c in enumerate(chunks)
             )
@@ -82,12 +117,12 @@ class ResumeCopilot:
             logger.error(f"An error occured while retrieving chunks, Error\n{str(e)}")
             raise e
 
-    async def job_matcher(self, job_description: str) -> str:
+    async def job_matcher(self) -> str:
         try:
-            resume_chunks = await self.vector_search(query=job_description, top_k=10)
+            resume_chunks = await self.fetch_resume_json()
 
             result = await job_matcher_chain.ainvoke(
-                {"resume_chunks": resume_chunks, "job_description": job_description}
+                {"Resume": resume_chunks, "job_description": self.job_description}
             )
             return f"""
             Match Score: {result.match_score}
@@ -104,8 +139,7 @@ class ResumeCopilot:
     async def fetch_resume_json(self) -> str:
         try:
             doc = await Documents.find_one(
-                Documents.user_id == self.user_id,
-                Documents.doc_id == self.doc_id
+                Documents.user_id == self.user_id, Documents.doc_id == self.doc_id
             )
 
             if not doc or not doc.parsed_resume:
@@ -116,24 +150,26 @@ class ResumeCopilot:
         except Exception as e:
             logger.error(
                 f"Error fetching parsed resume | user_id={self.user_id}, doc_id={self.doc_id} | {str(e)}",
-                exc_info=True
+                exc_info=True,
             )
             raise
 
     async def tailor_resume_json(
-        self, job_description: str, tone: str = "professional"
+        self, tone: str = "professional"
     ) -> str:
         try:
             resume_json_str = await self.fetch_resume_json()
             resume_data = json.loads(resume_json_str)
             if "error" in resume_data:
                 return resume_json_str
-            
-            response = await tailor_resume_chain.ainvoke({
-                "tone":tone,
-                "job_description":job_description,
-                "resume_json":json.dumps(resume_data, indent=2)
-            })
+
+            response = await tailor_resume_chain.ainvoke(
+                {
+                    "tone": tone,
+                    "job_description": self.job_description,
+                    "resume_json": json.dumps(resume_data, indent=2),
+                }
+            )
             return json.dumps(response.model_dump(), indent=2)
         except Exception as e:
             logger.error(
@@ -141,7 +177,9 @@ class ResumeCopilot:
             )
             raise e
 
-    def celery_dispatch(self, task_name: str, payload: ParsedResume, job_description: str):
+    def celery_dispatch(
+        self, task_name: str, payload: ParsedResume
+    ):
         try:
             SAFE_TASKS = {
                 "process_tailored_resume": resume_tasks.process_tailored_resume,
@@ -157,7 +195,10 @@ class ResumeCopilot:
                 )
 
             task = SAFE_TASKS[task_name].delay(
-                user_id=self.user_id, document_id=self.doc_id, payload=payload.model_dump(), job_description =job_description
+                user_id=self.user_id,
+                document_id=self.doc_id,
+                payload=payload.model_dump(),
+                job_description=self.job_description,
             )
             return json.dumps({"success": True, "task_id": task.id, "status": "queued"})
         except Exception as e:
@@ -169,7 +210,7 @@ class ResumeCopilot:
             StructuredTool(
                 name="VectorSearch",
                 description=(
-                    "Search the user's resume vector store for relevant chunks. "
+                    "Search the user's resume vector store for relevant chunks to be added "
                     "Use this for quick lookups or to answer questions about the resume."
                 ),
                 args_schema=VectorSearchInput,
@@ -182,7 +223,7 @@ class ResumeCopilot:
                     "Returns match_score, matched_skills, missing_skills, and a top recommendation. "
                     "Call this before TailorResumeJSON if you want to surface the gap report to the user."
                 ),
-                args_schema=JobMatchInput,
+                args_schema = NoInput,
                 coroutine=self.job_matcher,
             ),
             StructuredTool(
@@ -201,11 +242,10 @@ class ResumeCopilot:
                 name="CeleryDispatch",
                 description=(
                     "Dispatch a background task after tailoring is complete. "
-                    "Supported tasks: export_resume_pdf, send_resume_email, generate_cover_letter. "
                     "Pass the tailored resume JSON inside `payload`."
                 ),
                 args_schema=CeleryDispatchInput,
-                func=self.celery_dispatch,  
+                func=self.celery_dispatch,
             ),
         ]
 
@@ -213,7 +253,7 @@ class ResumeCopilot:
             [
                 ("system", prompts.TAILOR_SYSTEM_PROMPT),
                 ("human", "{input}"),
-                MessagesPlaceholder(variable_name="agent_scratchpad")
+                MessagesPlaceholder(variable_name="agent_scratchpad"),
             ]
         )
         agent = create_tool_calling_agent(
@@ -229,12 +269,15 @@ class ResumeCopilot:
             return_intermediate_steps=True,
             early_stopping_method="generate",
         )
-        
-    async def run(self, job_description:str):
+
+    async def run(self, job_description: str):
         try:
+            self.job_description = job_description
             agent = self.create_agent_executor()
-            result = await agent.ainvoke({"input":job_description})
+            result = await agent.ainvoke({"input": job_description})
             return result
         except Exception as e:
-            logger.error(f"An error occured while generating agent response, Error:\n{str(e)}")
+            logger.error(
+                f"An error occured while generating agent response, Error:\n{str(e)}"
+            )
             raise e

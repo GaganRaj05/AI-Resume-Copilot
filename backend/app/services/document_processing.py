@@ -6,6 +6,7 @@ from llama_index.core import (
     VectorStoreIndex,
     StorageContext,
 )
+from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.vector_stores.chroma import ChromaVectorStore
 from app.core import settings
@@ -16,6 +17,11 @@ from llama_index.readers.file import PDFReader, DocxReader
 
 logger = logging.getLogger(__name__)
 
+
+embed_model = OpenAIEmbedding(
+    model = settings.EMBED_MODEL,
+    api_key = settings.OPENAI_API_KEY
+)
 
 def _emit(callback, step:str, pct:int):
     if callback:
@@ -59,13 +65,7 @@ def run_pipeline(
     documents = reader.load_data()
     logger.info("[%s] Loaded %d document page(s)", doc_id, len(documents))
 
-    for doc in documents:
-        doc.metadata.update(
-            {
-                "user_id":user_id,
-                "document_id":doc_id,
-            }
-        )
+    
     
     _emit(progress_callback, "Splitting into chunks", 35)
     splitter = SentenceSplitter(
@@ -74,7 +74,13 @@ def run_pipeline(
         paragraph_separator = "\n\n"
     )        
     nodes = splitter.get_nodes_from_documents(documents)
-    
+    for node in nodes:
+        node.metadata={
+                **node.metadata,
+                "user_id":user_id,
+                "source_document_id":doc_id,
+            }
+        
     logger.info("[%s] Created %d chunk(s)", doc_id, len(nodes))
 
     if not nodes:
@@ -91,7 +97,8 @@ def run_pipeline(
     VectorStoreIndex(
         nodes = nodes,
         storage_context = storage_ctx,
-        show_progress = False
+        show_progress = False,
+        embed_model = embed_model
     )
     _emit(progress_callback, "Done", 100)
     logger.info("[%s] Indexing complete.", doc_id)

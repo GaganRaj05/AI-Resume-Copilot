@@ -83,10 +83,15 @@ async def send_tailored_resume(user_id: str, payload: dict):
     try:
         if not user_id or not payload:
             raise ValueError("User Id or Payload is None")
-        
-        user = await User.find_one({User.id == PydanticObjectId(user_id)})
+        try:
+            object_id = PydanticObjectId(user_id)
+        except Exception:
+            raise ValueError(f"Invalid user_id format: {user_id}")
+
+        user = await User.find_one(User.id == object_id)
         if not user:
-            raise Exception("No user found")
+            logger.error(f"No user found")
+            return
         generated_pdf = await generate_pdf(payload=payload)
         
         logger.info(f"Pdf couldn't be sent via email as domain cannot be configured at the moment")
@@ -100,28 +105,15 @@ async def save_tailored_resume(user_id: str, document_id: str, payload: dict, jo
 
         parsed_resume_obj = ParsedResume.model_validate(payload)
 
-        existing = await TailoredResumes.find_one({
-            "user_id": user_id,
-            "document_id": document_id
-        })
-
-        if existing:
-            existing.parsed_resume = parsed_resume_obj
-            existing.job_description = job_description
-            existing.updated_at = datetime.utcnow()
-            await existing.save()
-            result = existing
-        else:
-            result = TailoredResumes(
+        result = TailoredResumes(
                 user_id=user_id,
-                document_id=document_id,
+                document_id=f"{document_id}_{datetime.utcnow()}",
                 file_name="resume.pdf",
                 parsed_resume=parsed_resume_obj,
                 job_description=job_description,
                 created_at=datetime.utcnow(),
-                updated_at=datetime.utcnow()
             )
-            await result.insert()
+        await result.insert()
 
         logger.info(f"Resume upserted successfully | user_id={user_id}")
         return result

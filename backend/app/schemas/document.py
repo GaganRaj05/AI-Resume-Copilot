@@ -68,3 +68,6 @@ class CoverLetter(BaseModel):
 class CoverLetterRequest(BaseModel):
     user_id:str = Field(...)
     document_id:str = Field(...)
+    
+class NoInput(BaseModel):
+    pass

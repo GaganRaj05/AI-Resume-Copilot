@@ -104,42 +104,53 @@ def task_status(task_id: str) -> dict[str, Any]:
 
 
 @router.post("/tailor-resume")
-async def tailor_resume(data:ResumeTailorRequestInput):
+async def tailor_resume(data: ResumeTailorRequestInput):
     try:
         copilot = ResumeCopilot(
             user_id=data.user_id,
             doc_id=data.doc_id,
         )
+        last_message = None
+        messages = None
         result = await copilot.run(job_description=data.job_description)
-        output = result.get("output","").strip()
+        
+        if isinstance(result, dict) and "messages" in result:
+            messages = result["messages"]
+            # FIX: Use .content instead of ["content"]
+            last_message = messages[-1].content if messages else None
+            
+            output = last_message
+        else: 
+            output = str(result)
+
         if not output:
-            steps = result.get("intermediate_steps", [])
-            if steps:
-                last_tool_output = steps[-1][1]
-                raise HTTPException(
-                    status_code = 500,
-                    detail = {
-                        "success":False,
-                        "msg":f"Agent stopped before producing the final response"
-                    }
-                )
             raise HTTPException(
-                status_code = 500,
-                detail = {
-                    "success":False,
-                    "msg":"Agent produced no ouput"
+                status_code=500,
+                detail={
+                    "success": False,
+                    "msg": "Agent produced no output"
                 }
             )
+
         return {
-            "output":output,
-            "intermediate_steps":result.get("intermediate_steps",[])
+            "output": output,
+            "intermediate_steps": messages 
         }
+
     except HTTPException:
         raise
+
     except Exception as e:
-        logger.error(f"An error occured while tailoring the resume for {data.doc_id}, Error:\n{str(e)}")
-        raise HTTPException(status_code = 500, detail = {"success":False, "msg":"Server error"})
-    
+        logger.error(
+            f"Error tailoring resume for {data.doc_id}: {str(e)}"
+        )
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "msg": "Server error"
+            }
+        )   
 @router.post("/generat-cover-letter")
 async def process_cover_letter(data: CoverLetterRequest):
     try:

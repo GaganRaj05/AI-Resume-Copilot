@@ -1,10 +1,11 @@
-from fastapi import APIRouter, File, UploadFile, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, File, UploadFile, HTTPException, Query
+from fastapi.responses import JSONResponse, FileResponse
 from app.core import settings
 from app.worker.tasks import document_processing
 from app.worker.celery_app import celery_app
 from pathlib import Path
 from app.models.Document import Documents
+from app.models.TailoredResume import TailoredResumes
 import uuid
 import shutil
 import logging
@@ -63,7 +64,8 @@ async def upload_file(user_id:str, file: UploadFile = File(...)):
             user_id = user_id,
             doc_id = doc_id,
             original_name = file.filename,
-            parsed_resume = parsed
+            parsed_resume = parsed,
+            saved_path = saved_path
         )
         await document.insert()
         
@@ -161,3 +163,53 @@ async def process_cover_letter(data: CoverLetterRequest):
     except Exception as e:
         logger.error(f"An error occured while generating cover letter, Error: {str(e)}")
         raise HTTPException(status_code = 500, detail = {"success":False, "msg":"Server Error"})
+    
+@router.get("/get-resumes")
+async def get_resumes(user_id:str = Query(...)):
+    try:
+        docs = await Documents.find({"user_id":user_id})
+        return {"success":True, "msg":"Resumes fetched successfully", "docs":docs}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"An error occured while fetching resumes, Error: {str(e)}")
+        raise HTTPException(status_code = 500, detail = {"success":False, "msg":"Server Error"})
+
+        
+@router.get("/get-tailored-docs")
+async def get_tailored_resumes(user_id:str = Query(...)):
+    try:
+        docs = await TailoredResumes.find({"user_id":user_id})
+        return {"success":True, "msg":"Tailored Resumes fetched successfully", "docs":docs}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"An error occured while fetching tailored resumes, Error: {str(e)}")
+        raise HTTPException(status_code = 500, detail = {"success":False, "msg":"Server Error"})
+
+@router.post('/get-resume')
+async def get_resume(user_id:str, resume_id:str):
+    try:
+        doc = await Documents.find_one({"user_id":user_id, "doc_id":resume_id})
+        return FileResponse(
+            path = doc.saved_path,
+            media_type = "application/pdf",
+            filename = doc.original_name
+        )
+    except HTTPException as e:
+        raise 
+    except Exception as e:
+        logger.error(f"An error occured while fetching tailored resumes, Error: {str(e)}")
+        raise HTTPException(status_code = 500, detail = {"success":False, "msg":"Server Error"})
+
+@router.post('/get-tailored-resume')
+async def get_resume(user_id:str, resume_id:str):
+    try:
+        doc = await TailoredResumes.find_one({"user_id":user_id, "document_id":resume_id})
+        return {"success":True, "msg":"Resume found successfully", "parsed_resume":doc.parsed_resume}
+    except HTTPException as e:
+        raise 
+    except Exception as e:
+        logger.error(f"An error occured while fetching tailored resumes, Error: {str(e)}")
+        raise HTTPException(status_code = 500, detail = {"success":False, "msg":"Server Error"})
+    

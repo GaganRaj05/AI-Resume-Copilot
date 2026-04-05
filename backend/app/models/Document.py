@@ -9,6 +9,7 @@ class Documents(Document):
     original_name:str
     created_at:datetime =Field(default_factory = datetime.utcnow)
     parsed_resume:ParsedResume
+    saved_path: str =Field(...)
     class Settings:
         name = "Documents"
         indexes = ["user_id", "doc_id"]

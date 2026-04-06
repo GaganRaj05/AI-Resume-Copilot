@@ -12,7 +12,7 @@ import logging
 from typing import Any
 from pypdf import PdfReader
 from app.services.resume_parser import parse_resume
-from app.schemas.document import ResumeTailorRequestInput, CoverLetterRequest
+from app.schemas.document import ResumeTailorRequestInput, CoverLetterRequest, ResumeRequest
 from app.agents.resume_copilot import ResumeCopilot
 from app.services.resume_service import generate_cover_letter
 import asyncio
@@ -27,10 +27,30 @@ def validate_file(file:UploadFile)->None:
 
 
 def extract_text(file_path: str) -> str:
-    reader = PdfReader(file_path)
     text = ""
-    for page in reader.pages:
-        text += page.extract_text() or ""
+
+    with open(file_path, "rb") as f:   
+        reader = PdfReader(f)
+        for page in reader.pages:
+            text += page.extract_text() or ""
+
+    text_lower = text.lower()
+    keywords = ["summary","projects","education","skills","project","experience"]
+    score = sum(1 for k in keywords if k in text_lower)
+
+    if score <= 2:
+        file = Path(file_path)
+        try:
+            if file.exists() and file.is_file():
+                file.unlink()
+        except Exception as e:
+            logger.warning(f"Failed to delete file {file_path}: {str(e)}")
+
+        raise HTTPException(
+            status_code=422,
+            detail={"success": False, "msg": "File does not appear to be a resume"}
+        )
+
     return text
  
 def save_upload(user_id:str,file:UploadFile) -> tuple[str, Path]:
@@ -57,7 +77,7 @@ async def upload_file(user_id:str, file: UploadFile = File(...)):
         validate_file(file = file)
         doc_id, saved_path = save_upload(user_id=user_id, file=file)
         
-        extracted_text = await asyncio.get_event_loop().run_in_executor(None, extract_text, saved_path)
+        extracted_text = await asyncio.to_thread( extract_text, str(saved_path))
         parsed = await parse_resume(extracted_text)
 
         document = Documents(
@@ -65,7 +85,7 @@ async def upload_file(user_id:str, file: UploadFile = File(...)):
             doc_id = doc_id,
             original_name = file.filename,
             parsed_resume = parsed,
-            saved_path = saved_path
+            saved_path = str(saved_path)
         )
         await document.insert()
         
@@ -93,9 +113,9 @@ def task_status(task_id: str) -> dict[str, Any]:
         if result.successful():
             response["result"] = result.result
         elif result.failed():
-            response["error"] = str(result.result)  # exception string
+            response["error"] = str(result.result)  
         elif result.status == "PROGRESS":
-            response["progress"] = result.info  # dict sent via update_state()
+            response["progress"] = result.info  
     
         return response
     except HTTPException:
@@ -167,7 +187,7 @@ async def process_cover_letter(data: CoverLetterRequest):
 @router.get("/get-resumes")
 async def get_resumes(user_id:str = Query(...)):
     try:
-        docs = await Documents.find({"user_id":user_id})
+        docs = await Documents.find({"user_id": user_id}).to_list()
         return {"success":True, "msg":"Resumes fetched successfully", "docs":docs}
     except HTTPException:
         raise
@@ -179,7 +199,7 @@ async def get_resumes(user_id:str = Query(...)):
 @router.get("/get-tailored-docs")
 async def get_tailored_resumes(user_id:str = Query(...)):
     try:
-        docs = await TailoredResumes.find({"user_id":user_id})
+        docs = await TailoredResumes.find({"user_id":user_id}).to_list()
         return {"success":True, "msg":"Tailored Resumes fetched successfully", "docs":docs}
     except HTTPException:
         raise
@@ -188,9 +208,9 @@ async def get_tailored_resumes(user_id:str = Query(...)):
         raise HTTPException(status_code = 500, detail = {"success":False, "msg":"Server Error"})
 
 @router.post('/get-resume')
-async def get_resume(user_id:str, resume_id:str):
+async def get_resume(data:ResumeRequest ):
     try:
-        doc = await Documents.find_one({"user_id":user_id, "doc_id":resume_id})
+        doc = await Documents.find_one({"user_id":data.user_id, "doc_id":data.resume_id})
         return FileResponse(
             path = doc.saved_path,
             media_type = "application/pdf",
@@ -203,9 +223,9 @@ async def get_resume(user_id:str, resume_id:str):
         raise HTTPException(status_code = 500, detail = {"success":False, "msg":"Server Error"})
 
 @router.post('/get-tailored-resume')
-async def get_resume(user_id:str, resume_id:str):
+async def get_resume(data:ResumeRequest):
     try:
-        doc = await TailoredResumes.find_one({"user_id":user_id, "document_id":resume_id})
+        doc = await TailoredResumes.find_one({"user_id":data.user_id, "document_id":data.resume_id})
         return {"success":True, "msg":"Resume found successfully", "parsed_resume":doc.parsed_resume}
     except HTTPException as e:
         raise 

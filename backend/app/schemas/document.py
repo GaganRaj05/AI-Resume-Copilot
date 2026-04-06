@@ -71,3 +71,8 @@ class CoverLetterRequest(BaseModel):
     
 class NoInput(BaseModel):
     pass
+
+class ResumeRequest(BaseModel):
+    user_id:str = Field(...)
+    resume_id:str = Field(...)
+    

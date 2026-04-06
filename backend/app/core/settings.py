@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 UPLOAD_DIR = BASE_DIR/"uploads"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
-ALLOWED_EXTENSIONS = [".pdf",".doc",".docx"]
+ALLOWED_EXTENSIONS = [".pdf"]
 MAX_FILE_SIZE = 10
 MAX_FILE_BYTES = MAX_FILE_SIZE * 1024 * 1024
 

@@ -173,7 +173,7 @@ async def tailor_resume(data: ResumeTailorRequestInput):
                 "msg": "Server error"
             }
         )   
-@router.post("/generat-cover-letter")
+@router.post("/generate-cover-letter")
 async def process_cover_letter(data: CoverLetterRequest):
     try:
         result = await generate_cover_letter(user_id=data.user_id, document_id=data.document_id)
@@ -183,11 +183,27 @@ async def process_cover_letter(data: CoverLetterRequest):
     except Exception as e:
         logger.error(f"An error occured while generating cover letter, Error: {str(e)}")
         raise HTTPException(status_code = 500, detail = {"success":False, "msg":"Server Error"})
-    
+
+@router.post("/get-cover-letter")
+async def get_cover_letter(data:CoverLetterRequest):
+    try:
+        doc = await TailoredResumes.find_one({"user_id":data.user_id, "document_id":data.document_id})
+        if not doc:
+            raise HTTPException(status_code = 404, detail={"success":False, "msg":"Not Found"})
+        return {"success":True, "msg":"Cover Letter found successfully", "cover_letter":doc.cover_letter}
+    except HTTPException as e:
+        raise 
+    except Exception as e:
+        logger.error(f"An error occured while fetching Cover Letter, Error: {str(e)}")
+        raise HTTPException(status_code = 500, detail = {"success":False, "msg":"Server Error"})
+
 @router.get("/get-resumes")
 async def get_resumes(user_id:str = Query(...)):
     try:
         docs = await Documents.find({"user_id": user_id}).to_list()
+        if not docs:
+            raise HTTPException(status_code = 404, detail={"success":False, "msg":"Not Found"})
+
         return {"success":True, "msg":"Resumes fetched successfully", "docs":docs}
     except HTTPException:
         raise
@@ -200,6 +216,9 @@ async def get_resumes(user_id:str = Query(...)):
 async def get_tailored_resumes(user_id:str = Query(...)):
     try:
         docs = await TailoredResumes.find({"user_id":user_id}).to_list()
+        if not docs:
+            raise HTTPException(status_code = 404, detail={"success":False, "msg":"Not Found"})
+
         return {"success":True, "msg":"Tailored Resumes fetched successfully", "docs":docs}
     except HTTPException:
         raise
@@ -211,6 +230,9 @@ async def get_tailored_resumes(user_id:str = Query(...)):
 async def get_resume(data:ResumeRequest ):
     try:
         doc = await Documents.find_one({"user_id":data.user_id, "doc_id":data.resume_id})
+        if not doc:
+            raise HTTPException(status_code = 404, detail={"success":False, "msg":"Not Found"})
+
         return FileResponse(
             path = doc.saved_path,
             media_type = "application/pdf",
@@ -226,6 +248,9 @@ async def get_resume(data:ResumeRequest ):
 async def get_resume(data:ResumeRequest):
     try:
         doc = await TailoredResumes.find_one({"user_id":data.user_id, "document_id":data.resume_id})
+        if not doc:
+            raise HTTPException(status_code = 404, detail={"success":False, "msg":"Not Found"})
+
         return {"success":True, "msg":"Resume found successfully", "parsed_resume":doc.parsed_resume}
     except HTTPException as e:
         raise 

@@ -26,12 +26,12 @@ llm = ChatOpenAI(model=settings.OPENAI_MODEL, temperature = 0)
 cover_letter_structured = llm.with_structured_output(CoverLetter)
 
 cover_letter_generation_prompt = PromptTemplate(
-    input_variables = ["parsed_resume", "job_description"],
+    input_variables = ["parsed_resume", "job_description", "name"],
     
     template = """
     You are Cover Letter Generator.
     
-    Generate cover letter using infromation from the resume and Job Description.
+    Generate cover letter for {name} using infromation from the resume and Job Description.
     
     Resume:
     {parsed_resume}
@@ -92,7 +92,7 @@ async def send_tailored_resume(user_id: str, payload: dict):
         if not user:
             logger.error(f"No user found")
             return
-        generated_pdf = await generate_pdf(payload=payload)
+        # generated_pdf = await generate_pdf(payload=payload)
         
         logger.info(f"Pdf couldn't be sent via email as domain cannot be configured at the moment")
     except Exception as e:
@@ -126,16 +126,22 @@ async def generate_cover_letter(user_id:str, document_id:str):
     try:
         if not user_id or not document_id:
             raise ValueError("User Id or Payload is None")
-
+        
         parsed_resume = await TailoredResumes.find_one({
             "user_id": user_id,
             "document_id": document_id
         })
         if not parsed_resume:
             raise Exception("No resume found")
+        
+        user = await User.get(PydanticObjectId(user_id))
+        if not user:
+            raise ValueError("No user found")
+            
         result = await cover_letter_generator_chain.ainvoke({
             "parsed_resume":json.dumps(parsed_resume.parsed_resume.model_dump(), indent=2),
-            "job_description": parsed_resume.job_description
+            "job_description": parsed_resume.job_description,
+            "name":user.name
         })
         parsed_resume.cover_letter = result.cover_letter
         await parsed_resume.save()

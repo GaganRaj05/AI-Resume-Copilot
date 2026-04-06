@@ -1,0 +1,70 @@
+services:
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: fastapi_backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - chroma
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - CHROMA_HOST=chroma
+      - CHROMA_PORT=6000
+      - MONGODB_URL=mongodb://host.docker.internal:27017/
+    volumes:
+      - .:/app  
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile.celery
+    container_name: celery_worker
+    command: celery -A app.worker.celery_app worker --pool=threads --concurrency=4 --loglevel=info
+    depends_on:
+      - redis
+      - chroma
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - CHROMA_HOST=chroma
+      - CHROMA_PORT=6000
+      - MONGODB_URL=mongodb://host.docker.internal:27017/
+    volumes:
+      - .:/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  chroma:
+    build:
+      context: .
+      dockerfile: Dockerfile.chroma
+    container_name: chroma
+    ports:
+      - "6000:6000"
+    volumes:
+      - chroma_data:/chroma   
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  chroma_data:

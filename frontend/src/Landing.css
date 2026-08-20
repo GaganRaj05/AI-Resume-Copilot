@@ -1,0 +1,77 @@
+/* AgentCV Landing Page — supporting styles
+   Import once at the top of LandingPage.jsx:  import "./landing.css";
+
+   Requires Tailwind CSS (v3+) already set up in the host project.
+
+   Fonts: Sora (display/headings) + Inter (body/UI). Add to your
+   index.html <head> (or _document):
+
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+*/
+
+.acv-font {
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+.acv-display {
+  font-family: "Sora", ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+@keyframes acv-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+.acv-float {
+  animation: acv-float 4.5s ease-in-out infinite;
+}
+
+@keyframes acv-glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(23, 163, 74, 0.35); }
+  50% { box-shadow: 0 0 0 14px rgba(23, 163, 74, 0); }
+}
+.acv-glow-pulse {
+  animation: acv-glow-pulse 2.4s ease-out infinite;
+}
+
+@keyframes acv-dash {
+  to { stroke-dashoffset: 0; }
+}
+.acv-dash-path {
+  stroke-dasharray: 6 6;
+  stroke-dashoffset: 240;
+  animation: acv-dash 6s linear infinite;
+}
+
+@keyframes acv-spin {
+  to { transform: rotate(360deg); }
+}
+.acv-spin {
+  animation: acv-spin 1s linear infinite;
+}
+
+@keyframes acv-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.acv-marquee-track {
+  animation: acv-marquee 26s linear infinite;
+}
+.acv-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes acv-pop {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.acv-pop {
+  animation: acv-pop 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .acv-float, .acv-glow-pulse, .acv-dash-path, .acv-spin, .acv-marquee-track, .acv-pop {
+    animation: none !important;
+  }
+}

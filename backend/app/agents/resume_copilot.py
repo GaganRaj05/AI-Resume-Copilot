@@ -6,7 +6,6 @@ from langchain.agents import create_agent
 from langchain_core.prompts import (
     PromptTemplate,
     ChatPromptTemplate,
-    MessagesPlaceholder,
 )
 from langchain.tools import tool
 from langchain_openai import ChatOpenAI

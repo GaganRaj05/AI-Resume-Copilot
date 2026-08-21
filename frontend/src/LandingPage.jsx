@@ -17,9 +17,9 @@ import {
   Search,
   Layers,
   Lock,
-  AlertTriangle,
   EyeOff,
   Ban,
+  AlertTriangle,
   Gauge,
   MonitorDown,
   Wand2,
@@ -33,6 +33,16 @@ import {
   Mail,
   X,
   Check,
+  Hexagon,
+  Diamond,
+  Flame,
+  Feather,
+  Compass,
+  Anchor,
+  Mountain,
+  Cloud,
+  Zap,
+  Orbit,
 } from "lucide-react";
 import "./landing.css";
 
@@ -63,16 +73,22 @@ const TRUST_ROW = [
   { icon: CheckCircle2, label: "Export to PDF" },
 ];
 
-/* Pseudo-logo wall — abstract monogram marks, not real trademarks */
+/* Trust-bar logos — original abstract icon + wordmark lockups, not real
+   company trademarks. I can't reproduce actual brand logos without rights
+   to them, so each entry gets a distinct geometric icon instead of a real
+   logo file. Swap this array for real client logos (actual SVG files)
+   once you have companies who've agreed to be shown. */
 const COMPANIES = [
-  { name: "Nimbus Health", mark: "N", color: "#6552E8" },
-  { name: "Fintra", mark: "F", color: "#17A34A" },
-  { name: "Orbital Labs", mark: "O", color: "#E8895C" },
-  { name: "Voxel", mark: "V", color: "#3B82F6" },
-  { name: "Redline Studio", mark: "R", color: "#DB4C6B" },
-  { name: "Northgate", mark: "N", color: "#0EA5A5" },
-  { name: "Cinderbyte", mark: "C", color: "#A855F7" },
-  { name: "Fieldstone", mark: "F", color: "#CA8A04" },
+  { name: "Nimbus Health", icon: Cloud, color: "#6552E8" },
+  { name: "Fintra", icon: Diamond, color: "#17A34A" },
+  { name: "Orbital Labs", icon: Orbit, color: "#E8895C" },
+  { name: "Voxel", icon: Hexagon, color: "#3B82F6" },
+  { name: "Redline Studio", icon: Flame, color: "#DB4C6B" },
+  { name: "Northgate", icon: Compass, color: "#0EA5A5" },
+  { name: "Cinderbyte", icon: Zap, color: "#A855F7" },
+  { name: "Fieldstone", icon: Mountain, color: "#CA8A04" },
+  { name: "Anchorwell", icon: Anchor, color: "#2563EB" },
+  { name: "Featherlight", icon: Feather, color: "#DB2777" },
 ];
 
 const STATUS_STEPS = [
@@ -85,54 +101,70 @@ const STATUS_STEPS = [
 const PROBLEM_POINTS = [
   {
     icon: Clock,
-    stat: "10+ hrs",
-    statLabel: "lost every week",
-    title: "Manually tailoring every resume",
-    body: "Rewriting bullet points for each posting turns a job search into a second unpaid job.",
+    accent: "#6552E8",
+    accentSoft: "#EDEBFC",
+    stat: "10",
+    statSuffix: "+ hrs",
+    statLabel: "gone every week, rewriting the same resume",
+    title: "Tailoring is a second job",
+    body: "Every posting means re-reading a JD, rewriting bullets, and re-checking formatting — before you've even applied.",
   },
   {
     icon: Ban,
-    stat: "75%",
-    statLabel: "filtered before a human sees them",
-    title: "Rejected by ATS bots",
-    body: "Generic, one-size-fits-all resumes get screened out long before a recruiter opens them.",
+    accent: "#D1487A",
+    accentSoft: "#FCE9EF",
+    stat: "75",
+    statSuffix: "%",
+    statLabel: "of resumes never reach a human",
+    title: "Filtered out by ATS bots",
+    body: "A generic, one-size-fits-all resume gets screened out by keyword-matching software before a recruiter opens it.",
   },
   {
     icon: EyeOff,
-    stat: "Hours late",
-    statLabel: "to every good posting",
-    title: "Job posts you never see",
-    body: "By the time you remember to check the boards manually, the best roles are already buried.",
+    accent: "#CA8A04",
+    accentSoft: "#FBF1DA",
+    stat: "0",
+    statSuffix: " min",
+    statLabel: "spent watching boards while you sleep",
+    title: "The best posts fill up first",
+    body: "Manual searching means checking boards on your schedule, not the market's — the strongest matches disappear fast.",
   },
   {
     icon: AlertTriangle,
-    stat: "$29–99/mo",
-    statLabel: "for a cloud subscription",
-    title: "Tools that bill you monthly",
-    body: "Most \u201cAI resume\u201d products are SaaS wrappers that store your data on someone else's server.",
+    accent: "#17A34A",
+    accentSoft: "#E4F8EA",
+    stat: "29",
+    statSuffix: "–99/mo",
+    statLabel: "for a subscription you're renting",
+    title: "Cloud tools bill you monthly",
+    body: "Most \u201cAI resume\u201d products are SaaS wrappers that store your data on someone else's server and charge for the privilege.",
   },
 ];
 
 const HOW_IT_WORKS = [
   {
     icon: MonitorDown,
+    accent: "#6552E8",
     title: "Install & connect",
-    body: "Download the agent and point it at your resume and career background once.",
+    body: "Download the agent and point it at your resume and career background — a one-time, five-minute setup.",
   },
   {
     icon: Search,
+    accent: "#3B82F6",
     title: "Agent scrapes job boards",
-    body: "Runs automatically every day at 9am — or on demand — across the boards you choose.",
+    body: "Runs automatically every day at 9am — or on demand — across the boards and search terms you choose.",
   },
   {
     icon: Wand2,
+    accent: "#17A34A",
     title: "AI tailors it, locally",
-    body: "Each match gets a resume rewritten and optimized against that exact job description, on your machine.",
+    body: "Every match gets a resume rewritten and optimized against that exact job description, on your machine.",
   },
   {
     icon: ListChecks,
+    accent: "#CA8A04",
     title: "Review & apply",
-    body: "Browse your structured resume vault, pick the version, export to PDF, and apply.",
+    body: "Browse your structured resume vault, pick the version, export to PDF, and apply with confidence.",
   },
 ];
 
@@ -173,6 +205,27 @@ const REVIEWS = [
     quote: "Went from applying to 3 roles a week to having a tailored, ready resume for every relevant posting the agent finds. No more copy-paste fatigue.",
     rating: 4,
     color: "#E8895C",
+  },
+  {
+    name: "Jordan K.",
+    role: "DevOps Engineer",
+    quote: "I was skeptical of another 'AI resume tool' until I realized this one has no dashboard, no login, no monthly bill — just an exe that runs on my schedule.",
+    rating: 5,
+    color: "#3B82F6",
+  },
+  {
+    name: "Sofia D.",
+    role: "UX Researcher",
+    quote: "The 9am scrape means I open my laptop to resumes already tailored for anything new overnight. It changed how I think about job hunting.",
+    rating: 5,
+    color: "#DB4C6B",
+  },
+  {
+    name: "Tomás A.",
+    role: "Machine Learning Engineer",
+    quote: "Being able to see exactly what changed between versions in the resume vault is what sold me — nothing feels like a black box.",
+    rating: 4,
+    color: "#CA8A04",
   },
 ];
 
@@ -437,27 +490,40 @@ function HeroCopy() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Hero visual (right column) — compact two-row composition           */
+/*  Hero visual (right column) — dark HUD-style agent console          */
 /* ------------------------------------------------------------------ */
+
+function HudFrame({ className = "" }) {
+  /* Four corner brackets — the "targeting reticle" framing device */
+  const corner = "absolute h-3 w-3 border-[#8B78F0]";
+  return (
+    <div className={`pointer-events-none absolute inset-0 ${className}`}>
+      <span className={`${corner} left-0 top-0 border-l-2 border-t-2`} />
+      <span className={`${corner} right-0 top-0 border-r-2 border-t-2`} />
+      <span className={`${corner} bottom-0 left-0 border-b-2 border-l-2`} />
+      <span className={`${corner} bottom-0 right-0 border-b-2 border-r-2`} />
+    </div>
+  );
+}
 
 function InputCard({ iconBg, chipIcon: ChipIcon, title, chipLabel, buttonLabel, buttonColor, footnote }) {
   return (
-    <div className="w-full max-w-[168px] rounded-xl border border-[#ECEAF8] bg-white p-3 shadow-[0_8px_20px_-12px_rgba(20,20,43,0.18)]">
-      <p className="text-[11.5px] font-semibold text-[#14142B]">{title}</p>
-      <div className="mt-2 flex items-center gap-1.5 rounded-md bg-[#F7F6FC] px-2 py-1.5">
+    <div className="acv-mono w-full max-w-[168px] rounded-lg border border-white/10 bg-white/[0.04] p-3 backdrop-blur-sm">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-[#9D96D9]">{title}</p>
+      <div className="mt-2 flex items-center gap-1.5 rounded-md border border-white/5 bg-black/20 px-2 py-1.5">
         <div className={`flex h-5 w-5 flex-none items-center justify-center rounded ${iconBg}`}>
           <ChipIcon className="h-3 w-3 text-white" strokeWidth={2.5} />
         </div>
-        <span className="truncate text-[10.5px] font-medium text-[#3F3D56]">{chipLabel}</span>
+        <span className="truncate text-[10px] text-[#D8D5F0]">{chipLabel}</span>
       </div>
       <button
-        className="mt-2 w-full rounded-md px-2.5 py-1.5 text-[10.5px] font-semibold text-white transition hover:opacity-90"
-        style={{ backgroundColor: buttonColor }}
+        className="mt-2 w-full rounded-md px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-white transition hover:brightness-110"
+        style={{ backgroundColor: buttonColor, boxShadow: `0 0 16px -4px ${buttonColor}` }}
       >
         {buttonLabel}
       </button>
       {footnote && (
-        <p className="mt-1.5 flex items-center gap-1 text-[10px] text-[#8B899E]">
+        <p className="mt-1.5 flex items-center gap-1 text-[9.5px] text-[#726CAA]">
           <Clock className="h-2.5 w-2.5" />
           {footnote}
         </p>
@@ -468,7 +534,7 @@ function InputCard({ iconBg, chipIcon: ChipIcon, title, chipLabel, buttonLabel, 
 
 function StatusList() {
   return (
-    <div className="flex w-full max-w-[168px] flex-col gap-1.5">
+    <div className="acv-mono flex w-full max-w-[172px] flex-col gap-1.5">
       {STATUS_STEPS.map((step, i) => (
         <motion.div
           key={step.label}
@@ -476,13 +542,20 @@ function StatusList() {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.4, delay: 0.15 + i * 0.08 }}
-          className="flex items-center justify-between gap-2 rounded-lg border border-[#ECEAF8] bg-white px-2.5 py-2 shadow-[0_4px_12px_-8px_rgba(20,20,43,0.2)]"
+          className={`flex items-center justify-between gap-2 rounded-md border px-2.5 py-2 ${
+            step.done
+              ? "border-[#2A5A3E] bg-[#12271B]"
+              : "border-[#3B2E7A] bg-[#1A1440]"
+          }`}
         >
-          <span className="text-[10.5px] font-medium text-[#3F3D56]">{step.label}</span>
+          <span className={`text-[9.5px] uppercase tracking-wide ${step.done ? "text-[#7FD9A4]" : "text-[#B8AFF0]"}`}>
+            {step.label}
+            {!step.done && <span className="acv-blink">_</span>}
+          </span>
           {step.done ? (
-            <CheckCircle2 className="h-3.5 w-3.5 flex-none text-[#17A34A]" />
+            <CheckCircle2 className="h-3.5 w-3.5 flex-none text-[#34D399]" />
           ) : (
-            <Loader2 className="acv-spin h-3.5 w-3.5 flex-none text-[#6552E8]" />
+            <Loader2 className="acv-spin h-3.5 w-3.5 flex-none text-[#8B78F0]" />
           )}
         </motion.div>
       ))}
@@ -492,13 +565,26 @@ function StatusList() {
 
 function AgentNode() {
   return (
-    <div className="flex flex-col items-center gap-1.5">
-      <div className="acv-glow-pulse flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#E4F8EA] to-white ring-1 ring-[#CDEFDA]">
-        <Bot className="h-6 w-6 text-[#17A34A]" strokeWidth={1.75} />
+    <div className="relative flex flex-col items-center gap-2">
+      <div className="relative flex h-[76px] w-[76px] items-center justify-center">
+        {/* Rotating dashed rings */}
+        <div className="acv-orbit-slow absolute inset-0 rounded-full border border-dashed border-[#8B78F0]/40" />
+        <div className="acv-orbit-fast absolute inset-[8px] rounded-full border border-dashed border-[#34D399]/30" />
+        {/* Orbiting particles */}
+        <div className="acv-orbit-slow absolute inset-0">
+          <span className="absolute left-1/2 top-0 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-[#8B78F0] shadow-[0_0_8px_2px_rgba(139,120,240,0.7)]" />
+        </div>
+        <div className="acv-orbit-fast absolute inset-[8px]" style={{ animationDirection: "reverse" }}>
+          <span className="absolute left-1/2 top-0 h-1 w-1 -translate-x-1/2 rounded-full bg-[#34D399] shadow-[0_0_6px_2px_rgba(52,211,153,0.7)]" />
+        </div>
+        {/* Core */}
+        <div className="acv-glow-pulse-dark flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-[#2A2456] to-[#12102B] ring-1 ring-[#8B78F0]/50">
+          <Bot className="h-5 w-5 text-[#B8AFF0]" strokeWidth={1.75} />
+        </div>
       </div>
-      <p className="flex items-center gap-1 text-[11px] font-semibold text-[#14142B]">
-        <Sparkles className="h-3 w-3 text-[#6552E8]" />
-        AI Agent
+      <p className="acv-mono flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-[#D8D5F0]">
+        <Sparkles className="h-3 w-3 text-[#8B78F0]" />
+        Agent Core
       </p>
     </div>
   );
@@ -506,7 +592,8 @@ function AgentNode() {
 
 function OutputResumeCard() {
   return (
-    <div className="relative w-full max-w-[240px] rounded-xl border border-[#ECEAF8] bg-white p-4 shadow-[0_16px_36px_-16px_rgba(20,20,43,0.28)]">
+    <div className="relative w-full max-w-[240px] rounded-lg bg-white p-4 shadow-[0_0_0_1px_rgba(139,120,240,0.5),0_20px_45px_-16px_rgba(139,120,240,0.55)]">
+      <HudFrame className="-inset-2" />
       <motion.div
         initial={{ opacity: 0, y: -6 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -514,10 +601,10 @@ function OutputResumeCard() {
         transition={{ duration: 0.5, delay: 0.5 }}
         className="acv-float absolute -top-4 right-2"
       >
-        <Pill>
+        <span className="acv-mono inline-flex items-center gap-1.5 rounded-full bg-[#12271B] px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-[#34D399] shadow-[0_0_16px_-2px_rgba(52,211,153,0.6)]">
           <Sparkles className="h-3 w-3" />
           Ready
-        </Pill>
+        </span>
       </motion.div>
 
       <div className="flex items-center gap-2.5">
@@ -548,12 +635,12 @@ function OutputResumeCard() {
 
 function StoredResumeThumbs() {
   return (
-    <div className="mt-3 flex max-w-[240px] gap-2">
+    <div className="mt-4 flex max-w-[240px] gap-2">
       {[0, 1, 2, 3].map((i) => (
         <div
           key={i}
-          className={`relative h-12 w-10 flex-none rounded-md border bg-white p-1 ${
-            i === 1 ? "border-2 border-[#6552E8]" : "border-[#ECEAF8]"
+          className={`relative h-12 w-10 flex-none rounded-md border bg-white/95 p-1 ${
+            i === 1 ? "border-2 border-[#8B78F0] shadow-[0_0_10px_-1px_rgba(139,120,240,0.7)]" : "border-white/10"
           }`}
         >
           <div className="h-1 w-4 rounded-sm bg-[#E1DFF3]" />
@@ -562,7 +649,7 @@ function StoredResumeThumbs() {
             <div className="h-0.5 w-full rounded-sm bg-[#F0EFF8]" />
           </div>
           {i === 1 && (
-            <div className="absolute -bottom-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#6552E8]">
+            <div className="absolute -bottom-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#8B78F0]">
               <CheckCircle2 className="h-2.5 w-2.5 text-white" />
             </div>
           )}
@@ -574,22 +661,50 @@ function StoredResumeThumbs() {
 
 function FlowArrow() {
   return (
-    <svg width="36" height="24" viewBox="0 0 36 24" className="hidden flex-none text-[#C9C4EE] sm:block">
+    <svg width="36" height="24" viewBox="0 0 36 24" className="hidden flex-none sm:block">
+      <defs>
+        <linearGradient id="acv-flow-grad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#8B78F0" />
+          <stop offset="100%" stopColor="#34D399" />
+        </linearGradient>
+      </defs>
       <line
         x1="2" y1="12" x2="30" y2="12"
-        stroke="currentColor" strokeWidth="2"
+        stroke="url(#acv-flow-grad)" strokeWidth="2"
         className="acv-dash-path"
       />
-      <path d="M24 6 L32 12 L24 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M24 6 L32 12 L24 18" fill="none" stroke="#34D399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
 function HeroVisual() {
   return (
-    <div className="rounded-[24px] border border-[#ECEAF8] bg-white/60 p-4 sm:p-6">
+    <div className="relative overflow-hidden rounded-[24px] border border-[#3B2E7A]/60 bg-gradient-to-br from-[#0B0B1F] via-[#12102B] to-[#1A1440] p-4 shadow-[0_30px_60px_-25px_rgba(101,82,232,0.45)] sm:p-6">
+      {/* Ambient grid + glow backdrop */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.25]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(139,120,240,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(139,120,240,0.5) 1px, transparent 1px)",
+          backgroundSize: "26px 26px",
+          maskImage: "radial-gradient(ellipse at center, black 30%, transparent 75%)",
+        }}
+      />
+      <div className="pointer-events-none absolute -top-16 left-1/2 h-56 w-56 -translate-x-1/2 rounded-full bg-[#6552E8] opacity-30 blur-3xl" />
+      <div className="acv-scanline pointer-events-none absolute inset-x-0 h-24 bg-gradient-to-b from-transparent via-[#8B78F0]/10 to-transparent" />
+
+      {/* Status chrome */}
+      <div className="acv-mono relative mb-4 flex items-center justify-between text-[10px] uppercase tracking-wider text-[#726CAA]">
+        <span className="flex items-center gap-1.5">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#34D399]" />
+          Agent Online
+        </span>
+        <span>Local Runtime · No Network</span>
+      </div>
+
       {/* Row 1 — inputs -> agent -> status */}
-      <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-center sm:gap-2">
+      <div className="relative flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-center sm:gap-2">
         <div className="flex flex-col items-center gap-3">
           <InputCard
             iconBg="bg-[#17A34A]"
@@ -618,7 +733,7 @@ function HeroVisual() {
       </div>
 
       {/* Row 2 — output */}
-      <div className="mt-5 flex flex-col items-center border-t border-dashed border-[#E1DFF3] pt-5">
+      <div className="relative mt-5 flex flex-col items-center border-t border-dashed border-white/10 pt-6">
         <OutputResumeCard />
         <StoredResumeThumbs />
       </div>
@@ -630,16 +745,18 @@ function HeroVisual() {
 /*  Trusted-by logo wall                                               */
 /* ------------------------------------------------------------------ */
 
-function LogoMark({ name, mark, color }) {
+function LogoMark({ name, icon: Icon, color }) {
   return (
-    <div className="flex flex-none items-center gap-2 opacity-80 grayscale transition hover:opacity-100 hover:grayscale-0">
+    <div className="flex flex-none items-center gap-2.5 opacity-75 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0">
       <div
-        className="flex h-7 w-7 items-center justify-center rounded-md text-[12px] font-bold text-white"
-        style={{ backgroundColor: color }}
+        className="flex h-8 w-8 items-center justify-center rounded-lg"
+        style={{ backgroundColor: `${color}1A` }}
       >
-        {mark}
+        <Icon className="h-4.5 w-4.5" style={{ color }} strokeWidth={2.25} />
       </div>
-      <span className="acv-display whitespace-nowrap text-[15px] font-semibold text-[#3F3D56]">{name}</span>
+      <span className="acv-display whitespace-nowrap text-[16px] font-bold tracking-tight text-[#2A2840]">
+        {name}
+      </span>
     </div>
   );
 }
@@ -650,7 +767,7 @@ function TrustLogos() {
     <div className="border-y border-[#ECEAF8] bg-[#F6F5FC] py-10">
       <Reveal>
         <p className="text-center text-[13px] font-medium text-[#8B899E]">
-          Trusted by job seekers who&apos;ve landed offers at companies like
+          Built to tailor resumes for roles at companies like 
         </p>
       </Reveal>
       <div className="relative mx-auto mt-6 max-w-6xl overflow-hidden">
@@ -689,18 +806,22 @@ function ProblemSection() {
         {PROBLEM_POINTS.map((point, i) => (
           <Reveal key={point.title} delay={i * 0.08}>
             <motion.div
-              whileHover={{ y: -4 }}
+              whileHover={{ y: -5, boxShadow: `0 20px 40px -22px ${point.accent}66` }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="h-full rounded-2xl border border-[#ECEAF8] bg-white p-6"
+              className="group relative h-full overflow-hidden rounded-2xl border border-[#ECEAF8] bg-white p-6"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FDEEEA]">
-                <point.icon className="h-5 w-5 text-[#E8895C]" strokeWidth={2} />
+              <div className="absolute inset-x-0 top-0 h-[3px]" style={{ backgroundColor: point.accent }} />
+              <div
+                className="flex h-11 w-11 items-center justify-center rounded-full transition-transform duration-300 group-hover:scale-110"
+                style={{ backgroundColor: point.accentSoft }}
+              >
+                <point.icon className="h-5 w-5" style={{ color: point.accent }} strokeWidth={2} />
               </div>
-              <p className="acv-display mt-4 text-[24px] font-bold text-[#14142B]">
-                <CountUp value={point.stat} />
+              <p className="acv-display mt-4 text-[27px] font-bold text-[#14142B]">
+                <CountUp value={point.stat} suffix={point.statSuffix} />
               </p>
-              <p className="text-[11.5px] font-medium text-[#8B899E]">{point.statLabel}</p>
-              <p className="mt-3 text-[14px] font-bold text-[#14142B]">{point.title}</p>
+              <p className="text-[11.5px] font-medium leading-snug text-[#8B899E]">{point.statLabel}</p>
+              <p className="mt-3 text-[14.5px] font-bold text-[#14142B]">{point.title}</p>
               <p className="mt-1.5 text-[13px] leading-relaxed text-[#5B5B76]">{point.body}</p>
             </motion.div>
           </Reveal>
@@ -725,21 +846,33 @@ function HowItWorks() {
           </h2>
         </Reveal>
 
-        <div className="mt-14 grid gap-8 lg:grid-cols-4">
+        <div className="mt-14 grid gap-8 lg:grid-cols-4 lg:gap-10">
           {HOW_IT_WORKS.map((step, i) => (
             <Reveal key={step.title} delay={i * 0.1} className="relative">
-              <div className="flex flex-col items-start">
-                <div className="acv-display flex h-11 w-11 items-center justify-center rounded-full bg-[#14142B] text-[15px] font-bold text-white">
-                  {String(i + 1).padStart(2, "0")}
-                </div>
-                <div className="mt-4 flex h-11 w-11 items-center justify-center rounded-xl bg-[#EDEBFC]">
-                  <step.icon className="h-5 w-5 text-[#6552E8]" strokeWidth={2} />
+              <motion.div
+                whileHover={{ y: -4 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="flex h-full flex-col items-start rounded-2xl border border-[#ECEAF8] bg-white p-6"
+              >
+                <div
+                  className="relative flex h-12 w-12 items-center justify-center rounded-xl"
+                  style={{ backgroundColor: `${step.accent}17` }}
+                >
+                  <step.icon className="h-5.5 w-5.5" style={{ color: step.accent }} strokeWidth={2} />
+                  <span
+                    className="acv-display absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold text-white ring-2 ring-white"
+                    style={{ backgroundColor: step.accent }}
+                  >
+                    {i + 1}
+                  </span>
                 </div>
                 <p className="mt-4 text-[15.5px] font-bold text-[#14142B]">{step.title}</p>
                 <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#5B5B76]">{step.body}</p>
-              </div>
+              </motion.div>
               {i < HOW_IT_WORKS.length - 1 && (
-                <div className="absolute right-[-18px] top-[22px] hidden h-px w-9 border-t-2 border-dashed border-[#E1DFF3] lg:block" />
+                <div className="absolute -right-[26px] top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-[#F6F5FC] p-1 lg:block">
+                  <ArrowRight className="h-4 w-4 text-[#C9C4EE]" strokeWidth={2.5} />
+                </div>
               )}
             </Reveal>
           ))}
@@ -852,45 +985,66 @@ function Stars({ count }) {
   );
 }
 
-function ReviewsSection() {
+function ReviewCard({ review }) {
   return (
-    <section id="reviews" className="mx-auto max-w-7xl px-6 py-20 lg:px-10">
-      <Reveal className="mx-auto max-w-2xl text-center">
-        <SectionEyebrow>Reviews</SectionEyebrow>
-        <h2 className="acv-display mt-3 text-[32px] font-bold leading-tight text-[#14142B] sm:text-[38px]">
-          Job seekers, not marketers
-        </h2>
-      </Reveal>
-
-      <div className="mt-12 grid gap-5 lg:grid-cols-3">
-        {REVIEWS.map((review, i) => (
-          <Reveal key={review.name} delay={i * 0.1}>
-            <motion.div
-              whileHover={{ y: -4 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="flex h-full flex-col rounded-2xl border border-[#ECEAF8] bg-white p-6"
-            >
-              <Quote className="h-6 w-6 text-[#E1DFF3]" strokeWidth={2.5} />
-              <p className="mt-3 flex-1 text-[14px] leading-relaxed text-[#3F3D56]">&ldquo;{review.quote}&rdquo;</p>
-              <div className="mt-5 flex items-center gap-3">
-                <div
-                  className="flex h-9 w-9 flex-none items-center justify-center rounded-full text-[13px] font-bold text-white"
-                  style={{ backgroundColor: review.color }}
-                >
-                  {review.name.charAt(0)}
-                </div>
-                <div>
-                  <p className="text-[13.5px] font-bold text-[#14142B]">{review.name}</p>
-                  <p className="text-[11.5px] text-[#8B899E]">{review.role}</p>
-                </div>
-                <div className="ml-auto">
-                  <Stars count={review.rating} />
-                </div>
-              </div>
-            </motion.div>
-          </Reveal>
-        ))}
+    <motion.div
+      whileHover={{ y: -4 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      className="flex h-full w-[300px] flex-none flex-col rounded-2xl border border-[#ECEAF8] bg-white p-6 sm:w-[340px]"
+    >
+      <Quote className="h-6 w-6 text-[#E1DFF3]" strokeWidth={2.5} />
+      <p className="mt-3 flex-1 text-[14px] leading-relaxed text-[#3F3D56]">&ldquo;{review.quote}&rdquo;</p>
+      <div className="mt-5 flex items-center gap-3">
+        <div
+          className="flex h-9 w-9 flex-none items-center justify-center rounded-full text-[13px] font-bold text-white"
+          style={{ backgroundColor: review.color }}
+        >
+          {review.name.charAt(0)}
+        </div>
+        <div>
+          <p className="text-[13.5px] font-bold text-[#14142B]">{review.name}</p>
+          <p className="text-[11.5px] text-[#8B899E]">{review.role}</p>
+        </div>
+        <div className="ml-auto">
+          <Stars count={review.rating} />
+        </div>
       </div>
+    </motion.div>
+  );
+}
+
+function ReviewsSection() {
+  const rowA = REVIEWS.slice(0, 3);
+  const rowB = REVIEWS.slice(3, 6);
+  const rowADup = [...rowA, ...rowA];
+  const rowBDup = [...rowB, ...rowB];
+
+  return (
+    <section id="reviews" className="overflow-hidden py-20">
+      <div className="mx-auto max-w-7xl px-6 lg:px-10">
+        <Reveal className="mx-auto max-w-2xl text-center">
+          <SectionEyebrow>Reviews</SectionEyebrow>
+          <h2 className="acv-display mt-3 text-[32px] font-bold leading-tight text-[#14142B] sm:text-[38px]">
+            Job seekers, not marketers
+          </h2>
+        </Reveal>
+      </div>
+
+      <Reveal delay={0.1} className="relative mt-12">
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-[#F6F5FC] to-transparent sm:w-28" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-[#F6F5FC] to-transparent sm:w-28" />
+
+        <div className="acv-marquee-track flex w-max gap-5 px-4">
+          {rowADup.map((review, i) => (
+            <ReviewCard key={`a-${review.name}-${i}`} review={review} />
+          ))}
+        </div>
+        <div className="acv-marquee-track-reverse mt-5 flex w-max gap-5 px-4">
+          {rowBDup.map((review, i) => (
+            <ReviewCard key={`b-${review.name}-${i}`} review={review} />
+          ))}
+        </div>
+      </Reveal>
     </section>
   );
 }

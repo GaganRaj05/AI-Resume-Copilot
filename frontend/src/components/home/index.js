@@ -1,0 +1,11 @@
+export { default as Navbar } from './Navbar';
+export { HeroCopy, HeroVisual } from './Hero';
+export { default as TrustLogos } from './TrustLogos';
+export { default as ProblemSection } from './ProblemSection';
+export { default as HowItWorks } from './HowItWorks';
+export { default as WhyDifferent } from './WhyDifferent';
+export { default as FeatureStrip } from './FeatureStrip';
+export { default as ReviewsSection } from './ReviewsSection';
+export { default as FaqSection } from './FaqSection';
+export { default as FinalCta } from './FinalCta';
+export { default as Footer } from './Footer';

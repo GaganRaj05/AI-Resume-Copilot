@@ -25,6 +25,7 @@ import {
   Cloud,
   Zap,
   Orbit, 
+  BadgeCheck
 } from "lucide-react";
 
 const BRAND = "AgentCV";
@@ -187,6 +188,11 @@ const FEATURE_STRIP = [
     icon: Lock,
     title: "Private by Design",
     body: "Your data and API calls never leave your machine.",
+  },
+  {
+    icon: BadgeCheck,
+    title: "ATS Score & Overleaf Formatting",
+    body: "Every tailored resume gets an ATS compatibility score and is built on an Overleaf-style LaTeX template, then saved as a PDF in your vault under a folder named for the company.",
   },
 ];
 

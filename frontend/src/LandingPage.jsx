@@ -47,6 +47,7 @@ import {
   Sun,
   Moon,
   Asterisk,
+  BadgeCheck,
 } from "lucide-react";
 import "./Landing.css";
 
@@ -76,6 +77,7 @@ const TRUST_ROW = [
   { icon: CheckCircle2, label: "Runs Fully Offline" },
   { icon: CheckCircle2, label: "Export to PDF" },
 ];
+const late = ["Download", "Changelog", "Privacy", "Contact", "Documentation"];
 
 /* Trust-bar logos — original abstract icon + wordmark lockups, not real
    company trademarks. I can't reproduce actual brand logos without rights
@@ -214,6 +216,11 @@ const FEATURE_STRIP = [
     title: "Private by Design",
     body: "Your data and API calls never leave your machine.",
   },
+  {
+    icon: BadgeCheck,
+    title: "ATS Score & Overleaf Formatting",
+    body: "Every tailored resume gets an ATS compatibility score and is built on an Overleaf-style LaTeX template, then saved as a PDF in your vault under a folder named for the company.",
+  },
 ];
 
 const REVIEWS = [
@@ -291,6 +298,10 @@ const FAQ_ITEMS = [
   {
     q: "Can I edit a tailored resume before applying?",
     a: "Yes. Every generated version opens in an editable view before export, so you can fine-tune wording or formatting before it's saved to your vault.",
+  },
+  {
+    q: "Is the tailored resume ATS-friendly, and where does it get saved?",
+    a: "Every tailored resume is built on an Overleaf-style LaTeX template for clean, ATS-safe formatting, and comes with an ATS compatibility score so you know how it'll read to screening software. The finished PDF is saved locally on your machine, organized into a folder named after the company you're applying to.",
   },
 ];
 
@@ -1201,7 +1212,7 @@ function FeatureStrip() {
           </h2>
         </Reveal>
 
-        <div className="mt-12 grid gap-6 rounded-3xl border border-[var(--acv-border)] bg-[var(--acv-surface-alt)] p-8 sm:grid-cols-2 lg:grid-cols-5 lg:p-10">
+        <div className="mt-12 grid gap-6 rounded-3xl border border-[var(--acv-border)] bg-[var(--acv-surface-alt)] p-8 sm:grid-cols-2 lg:grid-cols-3 lg:p-10">
           {FEATURE_STRIP.map((item, i) => (
             <Reveal key={item.title} delay={i * 0.06}>
               <motion.div
@@ -1463,7 +1474,6 @@ const FOOTER_COLUMNS = [
     ],
   },
 ];
-const late = ["Download", "Changelog", "Privacy", "Contact", "Documentation"];
 
 function Footer() {
   return (

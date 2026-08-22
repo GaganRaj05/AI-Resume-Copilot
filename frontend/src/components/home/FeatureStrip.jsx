@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Reveal, SectionEyebrow } from '../ui';
 import { FEATURE_STRIP } from '../config/landingConfig';
@@ -17,7 +16,7 @@ export default function FeatureStrip() {
           </h2>
         </Reveal>
 
-        <div className="mt-12 grid gap-6 rounded-3xl border border-[var(--acv-border)] bg-[var(--acv-surface-alt)] p-8 sm:grid-cols-2 lg:grid-cols-5 lg:p-10">
+        <div className="mt-12 grid gap-6 rounded-3xl border border-[var(--acv-border)] bg-[var(--acv-surface-alt)] p-8 sm:grid-cols-2 lg:grid-cols-3 lg:p-10">
           {FEATURE_STRIP.map((item, i) => (
             <Reveal key={item.title} delay={i * 0.06}>
               <motion.div

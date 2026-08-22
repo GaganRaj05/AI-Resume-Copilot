@@ -175,7 +175,7 @@ const WaitlistPopup = ({ isOpen, onClose }) => {
                       </motion.div>
                       <div>
                         <h3 className="acv-display text-xl font-semibold leading-tight text-[var(--acv-ink)]">
-                          We're building our scrapers
+                          We're updating our scrapers
                         </h3>
                         <p className="text-sm text-[var(--acv-ink-faint)]">
                           Thanks for your interest in AgentCV

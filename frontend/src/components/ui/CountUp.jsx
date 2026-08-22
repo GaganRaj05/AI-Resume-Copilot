@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import  { useState, useEffect, useRef } from 'react';
 import { useInView, animate } from 'framer-motion';
 
 export default function CountUp({ value, suffix = "", prefix = "" }) {
@@ -13,7 +13,9 @@ export default function CountUp({ value, suffix = "", prefix = "" }) {
       duration: 1.4,
       ease: [0.16, 1, 0.3, 1],
       onUpdate(v) {
-        setDisplay(Number.isInteger(numeric) ? Math.round(v).toString() : v.toFixed(1));
+        setDisplay(
+          Number.isInteger(numeric) ? Math.round(v).toString() : v.toFixed(1),
+        );
       },
     });
     return () => controls.stop();

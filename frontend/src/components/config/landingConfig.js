@@ -1,36 +1,62 @@
 import {
-  FileText, Bot, Sparkles, CheckCircle2, BrainCircuit, Target,
-  HardDrive, FolderKanban, Clock, ShieldCheck, Search, Layers,
-  Lock, EyeOff, Ban, AlertTriangle, Gauge, MonitorDown, Wand2,
-  ListChecks, Cloud, Diamond, Orbit, Hexagon, Flame, Compass,
-  Anchor, Mountain, Zap, Feather, Quote
+  Sparkles,
+  CheckCircle2,
+  BrainCircuit,
+  Target,
+  HardDrive,
+  FolderKanban,
+  Search,
+  Layers,
+  Lock,
+  FilePenLine,
+  ScanSearch,
+  SearchX,
+  CreditCard,
+  MonitorDown,
+  Wand2,
+  ListChecks, 
+  Hexagon,
+  Diamond,
+  Flame,
+  Feather,
+  Compass,
+  Anchor,
+  Mountain,
+  Cloud,
+  Zap,
+  Orbit, 
 } from "lucide-react";
 
-export const BRAND = "AgentCV";
-export const OS_LABEL = "Windows";
+const BRAND = "AgentCV";
+const OS_LABEL = "Windows";
 
-export const NAV_LINKS = [
-  { label: "How it Works", href: "#how-it-works" },
-  { label: "Why AgentCV", href: "#why-different" },
-  { label: "Features", href: "#features" },
-  { label: "Reviews", href: "#reviews" },
-  { label: "FAQ", href: "#faq" },
+const NAV_LINKS = [
+  { label: "How it Works", id: "how-it-works" },
+  { label: "Why AgentCV", id: "why-different" },
+  { label: "Features", id: "features" },
+  { label: "Reviews", id: "reviews" },
+  { label: "FAQ", id: "faq" },
 ];
 
-export const HERO_BULLETS = [
+const HERO_BULLETS = [
   { icon: BrainCircuit, title: "Understands you & the job" },
   { icon: Target, title: "Tailored for every role" },
   { icon: HardDrive, title: "Runs 100% locally" },
   { icon: FolderKanban, title: "Structured resume vault" },
 ];
 
-export const TRUST_ROW = [
+const TRUST_ROW = [
   { icon: CheckCircle2, label: "Free Forever" },
   { icon: CheckCircle2, label: "Runs Fully Offline" },
   { icon: CheckCircle2, label: "Export to PDF" },
 ];
 
-export const COMPANIES = [
+/* Trust-bar logos — original abstract icon + wordmark lockups, not real
+   company trademarks. I can't reproduce actual brand logos without rights
+   to them, so each entry gets a distinct geometric icon instead of a real
+   logo file. Swap this array for real client logos (actual SVG files)
+   once you have companies who've agreed to be shown. */
+const COMPANIES = [
   { name: "Nimbus Health", icon: Cloud, color: "#6552E8" },
   { name: "Fintra", icon: Diamond, color: "#17A34A" },
   { name: "Orbital Labs", icon: Orbit, color: "#E8895C" },
@@ -43,18 +69,17 @@ export const COMPANIES = [
   { name: "Featherlight", icon: Feather, color: "#DB2777" },
 ];
 
-export const STATUS_STEPS = [
+const STATUS_STEPS = [
   { label: "Analyzing Background", done: true },
   { label: "Scraping Job Boards", done: true },
   { label: "Tailoring Resume", done: true },
   { label: "Generating Resume", done: false },
 ];
 
-export const PROBLEM_POINTS = [
+const PROBLEM_POINTS = [
   {
-    icon: Clock,
+    icon: FilePenLine,
     accent: "#6552E8",
-    accentSoft: "#EDEBFC",
     stat: "10",
     statSuffix: "+ hrs",
     statLabel: "gone every week, rewriting the same resume",
@@ -62,9 +87,8 @@ export const PROBLEM_POINTS = [
     body: "Every posting means re-reading a JD, rewriting bullets, and re-checking formatting — before you've even applied.",
   },
   {
-    icon: Ban,
+    icon: ScanSearch,
     accent: "#D1487A",
-    accentSoft: "#FCE9EF",
     stat: "75",
     statSuffix: "%",
     statLabel: "of resumes never reach a human",
@@ -72,9 +96,8 @@ export const PROBLEM_POINTS = [
     body: "A generic, one-size-fits-all resume gets screened out by keyword-matching software before a recruiter opens it.",
   },
   {
-    icon: EyeOff,
+    icon: SearchX,
     accent: "#CA8A04",
-    accentSoft: "#FBF1DA",
     stat: "0",
     statSuffix: " min",
     statLabel: "spent watching boards while you sleep",
@@ -82,18 +105,17 @@ export const PROBLEM_POINTS = [
     body: "Manual searching means checking boards on your schedule, not the market's — the strongest matches disappear fast.",
   },
   {
-    icon: AlertTriangle,
+    icon: CreditCard,
     accent: "#17A34A",
-    accentSoft: "#E4F8EA",
     stat: "29",
     statSuffix: "–99/mo",
     statLabel: "for a subscription you're renting",
     title: "Cloud tools bill you monthly",
-    body: "Most \"AI resume\" products are SaaS wrappers that store your data on someone else's server and charge for the privilege.",
+    body: "Most “AI resume” products are SaaS wrappers that store your data on someone else's server and charge for the privilege.",
   },
 ];
 
-export const HOW_IT_WORKS = [
+const HOW_IT_WORKS = [
   {
     icon: MonitorDown,
     accent: "#6552E8",
@@ -120,68 +142,106 @@ export const HOW_IT_WORKS = [
   },
 ];
 
-export const COMPARISON_ROWS = [
+const COMPARISON_ROWS = [
   { label: "Monthly subscription", cloud: "$29–99/mo", local: "Free, forever" },
-  { label: "Where your data lives", cloud: "Their servers", local: "Your machine, only" },
-  { label: "Job discovery", cloud: "Paste manually", local: "Auto-scraped daily" },
+  {
+    label: "Where your data lives",
+    cloud: "Their servers",
+    local: "Your machine, only",
+  },
+  {
+    label: "Job discovery",
+    cloud: "Paste manually",
+    local: "Auto-scraped daily",
+  },
   { label: "Works without internet", cloud: false, local: true },
-  { label: "Resume history", cloud: "Capped by plan", local: "Unlimited local vault" },
+  {
+    label: "Resume history",
+    cloud: "Capped by plan",
+    local: "Unlimited local vault",
+  },
 ];
 
-export const FEATURE_STRIP = [
-  { icon: Sparkles, title: "AI-Powered Agent", body: "Works independently to understand your background and tailor your resume." },
-  { icon: Search, title: "Local Job Scraper", body: "Checks job boards every day at 9am, or on demand whenever you trigger it." },
-  { icon: Target, title: "Role-Specific Tailoring", body: "Highlights the right skills and experience for every job it finds." },
-  { icon: Layers, title: "Structured Resume Vault", body: "Every tailored version saved and organized by role, ready to export." },
-  { icon: Lock, title: "Private by Design", body: "Your data and API calls never leave your machine." },
+const FEATURE_STRIP = [
+  {
+    icon: Sparkles,
+    title: "AI-Powered Agent",
+    body: "Works independently to understand your background and tailor your resume.",
+  },
+  {
+    icon: Search,
+    title: "Local Job Scraper",
+    body: "Checks job boards every day at 9am, or on demand whenever you trigger it.",
+  },
+  {
+    icon: Target,
+    title: "Role-Specific Tailoring",
+    body: "Highlights the right skills and experience for every job it finds.",
+  },
+  {
+    icon: Layers,
+    title: "Structured Resume Vault",
+    body: "Every tailored version saved and organized by role, ready to export.",
+  },
+  {
+    icon: Lock,
+    title: "Private by Design",
+    body: "Your data and API calls never leave your machine.",
+  },
 ];
 
-export const REVIEWS = [
+const REVIEWS = [
   {
     name: "Priya M.",
     role: "Data Analyst, job-searching",
-    quote: "I stopped rewriting my resume at midnight. The agent has it ready before I've had coffee, tailored to whatever came in overnight.",
+    quote:
+      "I stopped rewriting my resume at midnight. The agent has it ready before I've had coffee, tailored to whatever came in overnight.",
     rating: 5,
     color: "#6552E8",
   },
   {
     name: "Marcus T.",
     role: "Product Designer",
-    quote: "The fact that nothing leaves my laptop is the actual selling point for me, not just a footnote. It just works quietly in the background.",
+    quote:
+      "The fact that nothing leaves my laptop is the actual selling point for me, not just a footnote. It just works quietly in the background.",
     rating: 5,
     color: "#17A34A",
   },
   {
     name: "Elena R.",
     role: "Backend Engineer",
-    quote: "Went from applying to 3 roles a week to having a tailored, ready resume for every relevant posting the agent finds. No more copy-paste fatigue.",
+    quote:
+      "Went from applying to 3 roles a week to having a tailored, ready resume for every relevant posting the agent finds. No more copy-paste fatigue.",
     rating: 4,
     color: "#E8895C",
   },
   {
     name: "Jordan K.",
     role: "DevOps Engineer",
-    quote: "I was skeptical of another 'AI resume tool' until I realized this one has no dashboard, no login, no monthly bill — just an exe that runs on my schedule.",
+    quote:
+      "I was skeptical of another 'AI resume tool' until I realized this one has no dashboard, no login, no monthly bill — just an exe that runs on my schedule.",
     rating: 5,
     color: "#3B82F6",
   },
   {
     name: "Sofia D.",
     role: "UX Researcher",
-    quote: "The 9am scrape means I open my laptop to resumes already tailored for anything new overnight. It changed how I think about job hunting.",
+    quote:
+      "The 9am scrape means I open my laptop to resumes already tailored for anything new overnight. It changed how I think about job hunting.",
     rating: 5,
     color: "#DB4C6B",
   },
   {
     name: "Tomás A.",
     role: "Machine Learning Engineer",
-    quote: "Being able to see exactly what changed between versions in the resume vault is what sold me — nothing feels like a black box.",
+    quote:
+      "Being able to see exactly what changed between versions in the resume vault is what sold me — nothing feels like a black box.",
     rating: 4,
     color: "#CA8A04",
   },
 ];
 
-export const FAQ_ITEMS = [
+const FAQ_ITEMS = [
   {
     q: "Does my data ever leave my computer?",
     a: `No. ${BRAND} runs inference locally — your background, job descriptions, and generated resumes stay on your machine unless you explicitly choose to export or share them.`,
@@ -208,29 +268,38 @@ export const FAQ_ITEMS = [
   },
 ];
 
-export const FOOTER_COLUMNS = [
+const FOOTER_COLUMNS = [
   {
     title: "Product",
     links: [
-      { label: "Features", href: "#features" },
-      { label: "How it Works", href: "#how-it-works" },
-      { label: "Download", action: "popup" },
+      { label: "Features", id: "features" },
+      { label: "How it Works", id: "how-it-works" },
+      { label: "Download" },
     ],
   },
   {
     title: "Resources",
     links: [
-      { label: "FAQ", href: "#faq" },
-      { label: "Documentation", action: "popup" },
-      { label: "Changelog", action: "popup" },
+      { label: "FAQ", id: "faq" },
+      { label: "Documentation" },
+      { label: "Changelog" },
     ],
   },
   {
     title: "Company",
     links: [
-      { label: "About", action: "#features" },
-      { label: "Contact", action: "popup" },
-      { label: "Privacy", action: "popup" },
+      { label: "About" },
+      { label: "Contact" },
+      { label: "Privacy" },
     ],
   },
 ];
+const TICKER_ITEMS = [
+  "Runs 100% Locally",
+  "Zero Cloud Bills",
+  "Free Forever",
+  "Scrapes Jobs Daily at 9am",
+  "Your Data Never Leaves Your Machine",
+];
+
+export {BRAND, OS_LABEL, NAV_LINKS, TICKER_ITEMS, FOOTER_COLUMNS, FAQ_ITEMS, REVIEWS, FEATURE_STRIP, COMPARISON_ROWS, HOW_IT_WORKS, PROBLEM_POINTS, COMPANIES, STATUS_STEPS, TRUST_ROW, HERO_BULLETS }

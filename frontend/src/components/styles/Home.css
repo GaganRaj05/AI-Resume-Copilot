@@ -3,144 +3,124 @@
 
    Requires Tailwind CSS (v3+) already set up in the host project.
 
-   Fonts: Sora (display/headings) + Inter (body/UI) + JetBrains Mono (the
-   hero's HUD/terminal readouts). Add to your index.html <head> (or
-   _document):
+   Fonts: Sora (display/headings) + Inter (body/UI) + Fraunces (italic serif
+   accent word in headings) + JetBrains Mono (hero HUD readouts + numbered
+   eyebrows). Add to your index.html <head> (or _document):
 
    <link rel="preconnect" href="https://fonts.googleapis.com">
    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&family=Fraunces:ital,wght@1,500;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 */
 
 /* ------------------------------------------------------------------ */
-/*  Theme tokens — light (default) + dark                             */
-/*  Toggled by adding/removing the `.dark` class on the page root.    */
+/*  Theme tokens — light default, dark override via .dark on the same  */
+/*  element that carries .acv-font (see LandingPage's root wrapper).   */
+/*  Only page-chrome (nav, section backgrounds, body copy) is theme-   */
+/*  aware; the hero's agent console and the final-CTA banner stay      */
+/*  intentionally dark in both modes, like a permanently-dark terminal */
+/*  panel inside a light app.                                          */
 /* ------------------------------------------------------------------ */
-:root {
+
+.acv-font {
   --acv-bg: #F6F5FC;
   --acv-surface: #FFFFFF;
   --acv-surface-alt: #F9F8FE;
-  --acv-surface-soft: #F7F6FC;
+  --acv-surface-highlight: #FAFAFE;
   --acv-border: #ECEAF8;
-  --acv-border-strong: #E1DFF3;
-  --acv-divider: #F0EFF8;
+  --acv-border-soft: #F0EFF8;
+  --acv-ink: #14142B;
+  --acv-ink-medium: #3F3D56;
+  --acv-ink-soft: #5B5B76;
+  --acv-ink-faint: #8B899E;
+  --acv-nav-bg: rgba(246, 245, 252, 0.85);
 
-  --acv-heading: #14142B;
-  --acv-body: #5B5B76;
-  --acv-body-strong: #3F3D56;
-  --acv-muted: #8B899E;
-
-  --acv-accent: #6552E8;
-  --acv-accent-strong: #4B3DD1;
-  --acv-accent-soft: #EDEBFC;
-  --acv-accent-2: #8B5CF6;
-  --acv-accent-faint: #9D96D9;
-  --acv-accent-pale: #C9C4EE;
-
-  --acv-success: #17A34A;
-  --acv-success-strong: #128238;
-  --acv-success-soft: #E4F8EA;
-  --acv-success-bright: #34D399;
-
-  --acv-danger: #D1487A;
-  --acv-warning: #CA8A04;
-  --acv-star: #F5A623;
-
-  --acv-shadow-tint: rgba(101, 82, 232, 0.12);
-  --acv-grid-line: rgba(101, 82, 232, 0.08);
-  color-scheme: light;
-}
-
-.dark {
-  --acv-bg: #0A0A18;
-  --acv-surface: #12111F;
-  --acv-surface-alt: #15142A;
-  --acv-surface-soft: #181630;
-
-  --acv-border: rgba(255, 255, 255, 0.08);
-  --acv-border-strong: rgba(255, 255, 255, 0.14);
-  --acv-divider: rgba(255, 255, 255, 0.06);
-
-  --acv-heading: #F5F3FF;
-  --acv-body: #B4AFD6;
-  --acv-body-strong: #D8D5F0;
-  --acv-muted: #837FA6;
-
-  --acv-accent: #8B78F0;
-  --acv-accent-strong: #A594F5;
-  --acv-accent-soft: rgba(139, 120, 240, 0.14);
-  --acv-accent-2: #B39CFF;
-  --acv-accent-faint: #9D96D9;
-  --acv-accent-pale: rgba(201, 196, 238, 0.35);
-
-  --acv-success: #34D399;
-  --acv-success-strong: #6EE7B7;
-  --acv-success-soft: rgba(52, 211, 153, 0.14);
-  --acv-success-bright: #34D399;
-
-  --acv-danger: #F27FA6;
-  --acv-warning: #F0C24B;
-  --acv-star: #FBBF24;
-
-  --acv-shadow-tint: rgba(139, 120, 240, 0.28);
-  --acv-grid-line: rgba(139, 120, 240, 0.14);
-  color-scheme: dark;
-}
-
-/* Smooth theme crossfade */
-.acv-theme-root,
-.acv-theme-root * {
-  transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
-}
-
-.acv-font {
   font-family: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  font-feature-settings: "ss01" 1, "cv05" 1;
 }
+
+.acv-font.dark {
+  --acv-bg: #0D0C1F;
+  --acv-surface: #16142E;
+  --acv-surface-alt: #1B1938;
+  --acv-surface-highlight: #1F1C42;
+  --acv-border: #2A2650;
+  --acv-border-soft: #241F48;
+  --acv-ink: #F5F4FC;
+  --acv-ink-medium: #C7C4E3;
+  --acv-ink-soft: #A9A6C9;
+  --acv-ink-faint: #8481A8;
+  --acv-nav-bg: rgba(13, 12, 31, 0.8);
+}
+
+/* Smooth crossfade on toggle, scoped to color-ish properties only so it
+   never fights framer-motion's transform-based animations. */
+.acv-font, .acv-font *, .acv-font *::before, .acv-font *::after {
+  transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .acv-font, .acv-font *, .acv-font *::before, .acv-font *::after {
+    transition: none;
+  }
+}
+
 .acv-display {
   font-family: "Sora", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  letter-spacing: -0.02em;
 }
 .acv-mono {
   font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-  font-variant-numeric: tabular-nums;
+}
+.acv-serif {
+  font-family: "Fraunces", ui-serif, Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
 }
 
-/* Numerals in stat callouts should line up regardless of digit shape */
-.acv-nums {
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
-}
-
-/* Gradient text accent, reused across section headings */
-.acv-gradient-text {
-  background-image: linear-gradient(100deg, var(--acv-accent) 0%, var(--acv-accent-2) 55%, var(--acv-success) 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: acv-gradient-shift 6s ease-in-out infinite;
-}
-@keyframes acv-gradient-shift {
-  0%, 100% { background-position: 0% center; }
-  50% { background-position: 100% center; }
-}
-
-/* Small eyebrow tick mark used before uppercase labels */
-.acv-eyebrow {
+/* Fine dot-grid texture for section backdrops — echoes the hero's grid at
+   a much lower intensity so light sections don't feel like flat cutouts. */
+.acv-dotgrid {
   position: relative;
-  padding-left: 20px;
+  isolation: isolate;
 }
-.acv-eyebrow::before {
+
+.acv-dotgrid::before {
   content: "";
   position: absolute;
-  left: 0;
-  top: 50%;
-  width: 14px;
-  height: 2px;
-  transform: translateY(-50%);
-  background: linear-gradient(90deg, var(--acv-accent), var(--acv-success));
-  border-radius: 2px;
+  inset: 0;
+  z-index: -1;
+
+  background-image: radial-gradient(
+    var(--acv-border) 1.2px,
+    transparent 1.2px
+  );
+  background-size: 22px 22px;
+
+  -webkit-mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 0%,
+    black 40%,
+    transparent 85%
+  );
+
+  mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 0%,
+    black 40%,
+    transparent 85%
+  );
+}
+
+/* Button shine sweep on hover */
+.acv-shine {
+  position: relative;
+  overflow: hidden;
+}
+.acv-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 0.6s ease;
+}
+.acv-shine:hover::after {
+  transform: translateX(120%);
 }
 
 @keyframes acv-float {
@@ -238,51 +218,106 @@
   animation: acv-pop 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Ambient drifting blobs used behind section content for depth */
-@keyframes acv-blob-drift {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(3%, -4%) scale(1.06); }
-  66% { transform: translate(-3%, 3%) scale(0.96); }
-}
-.acv-blob {
-  animation: acv-blob-drift 14s ease-in-out infinite;
-}
-.acv-blob-slow {
-  animation: acv-blob-drift 20s ease-in-out infinite reverse;
-}
-
-/* Shimmer sweep used on the Problem-section icon tiles */
-@keyframes acv-shimmer {
-  0% { transform: translateX(-120%) rotate(8deg); }
-  100% { transform: translateX(220%) rotate(8deg); }
-}
-.acv-shimmer::after {
-  content: "";
-  position: absolute;
-  top: -40%;
-  left: 0;
-  width: 40%;
-  height: 180%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
-  animation: acv-shimmer 3.2s ease-in-out infinite;
-  animation-delay: 1s;
-}
-.dark .acv-shimmer::after {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.16), transparent);
-}
-
-/* Theme-toggle sun/moon crossfade */
-.acv-theme-icon {
-  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-}
-
 /* Respect reduced-motion preference */
 @media (prefers-reduced-motion: reduce) {
   .acv-float, .acv-glow-pulse, .acv-dash-path, .acv-spin, .acv-marquee-track,
   .acv-marquee-track-reverse, .acv-pop, .acv-scanline, .acv-orbit-slow,
-  .acv-orbit-fast, .acv-glow-pulse-dark, .acv-blink, .acv-gradient-text,
-  .acv-blob, .acv-blob-slow, .acv-shimmer::after, .acv-theme-icon {
+  .acv-orbit-fast, .acv-glow-pulse-dark, .acv-blink, .acv-ticker-track {
     animation: none !important;
-    transition: none !important;
   }
 }
+
+/* Slim ticker bar under the navbar */
+@keyframes acv-ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.acv-ticker-track {
+  animation: acv-ticker 22s linear infinite;
+}
+
+.acv-dotgrid {
+  position: relative;
+  isolation: isolate;
+}
+
+.acv-dotgrid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  background-image: radial-gradient(
+    var(--acv-border) 1.2px,
+    transparent 1.2px
+  );
+  background-size: 22px 22px;
+
+  -webkit-mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 0%,
+    black 40%,
+    transparent 85%
+  );
+  mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 0%,
+    black 40%,
+    transparent 85%
+  );
+}
+
+/* Ultra-small mobile support: 320px–374px */
+html, body { width:100%; max-width:100%; overflow-x:hidden; }
+.acv-font { width:100%; max-width:100%; overflow-x:clip; }
+
+@media (max-width:374px) {
+  .acv-font nav { padding-left:10px; padding-right:10px; gap:8px; }
+  .acv-font nav > div:first-child { min-width:0; flex:1 1 auto; }
+  .acv-font nav > div:first-child > div:last-child { min-width:0; }
+  .acv-font nav > div:last-child { flex:0 0 auto; gap:6px; }
+  .acv-font nav .acv-shine { min-width:0; }
+  .acv-font nav .acv-nav-download-label { display:none; }
+
+  .acv-font main { padding-left:12px; padding-right:12px; padding-top:28px; }
+  .acv-font section { padding-left:12px; padding-right:12px; }
+  .acv-font footer > div { padding-left:12px; padding-right:12px; }
+
+  .acv-font .acv-hero-pill { max-width:100%; padding-left:10px; padding-right:10px; font-size:10.5px; gap:5px; white-space:nowrap; }
+  .acv-font .acv-hero-title { margin-top:14px; font-size:31px; line-height:1.08; }
+  .acv-font .acv-hero-copy { font-size:14px; line-height:1.55; }
+  .acv-font .acv-hero-bullets { grid-template-columns:1fr; gap:8px; }
+  .acv-font .acv-hero-actions, .acv-font .acv-hero-actions > * { width:100%; }
+  .acv-font .acv-trust-row { justify-content:flex-start; gap:8px 12px; }
+  .acv-font .acv-trust-row > div { font-size:11.5px; }
+
+  .acv-font .acv-hero-visual { border-radius:16px; padding:10px; }
+  .acv-font .acv-hero-visual-status { align-items:flex-start; gap:8px; font-size:8px; }
+  .acv-font .acv-hero-visual-status > span:last-child { text-align:right; }
+  .acv-font .acv-hero-flow { gap:10px; }
+  .acv-font .acv-input-stack, .acv-font .acv-status-list { width:100%; max-width:100%; }
+  .acv-font .acv-input-card, .acv-font .acv-output-card { max-width:100%; }
+
+  .acv-font .acv-section-heading { font-size:28px; }
+  .acv-font .acv-section-copy { font-size:14px; }
+  .acv-font .acv-problem-card, .acv-font .acv-how-card { padding:18px; }
+
+  .acv-font .acv-comparison-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .acv-font .acv-comparison-table { min-width:520px; }
+  .acv-font .acv-review-card { width:270px; min-width:270px; }
+  .acv-font .acv-faq-question { font-size:13.5px; padding-right:4px; }
+
+  .acv-font .acv-final-cta { border-radius:18px; padding:40px 18px; }
+  .acv-font .acv-final-cta h2 { font-size:27px; }
+  .acv-font .acv-final-cta p { font-size:14px; }
+  .acv-font .acv-final-cta-actions, .acv-font .acv-final-cta-actions > * { width:100%; }
+
+  .acv-font .acv-footer-columns { grid-template-columns:repeat(2,minmax(0,1fr)); gap:28px 18px; }
+  .acv-font .acv-footer-brand { grid-column:1 / -1; }
+  .acv-font .acv-footer-bottom { align-items:flex-start; }
+  .acv-font .acv-footer-bottom > p { font-size:11px; }
+}
+
+@media (min-width:375px) and (max-width:639px) {
+  .acv-font .acv-hero-bullets { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .acv-font .acv-hero-title { font-size:36px; }
+}
+

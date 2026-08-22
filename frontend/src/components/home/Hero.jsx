@@ -8,12 +8,16 @@ import { Pill, PrimaryButton, SecondaryButton, Reveal, CountUp } from '../ui';
 import { BRAND, OS_LABEL, HERO_BULLETS, TRUST_ROW, STATUS_STEPS } from '../config/landingConfig';
 import WaitlistPopup from './forms/WaitListPopUp';
 // Hero Copy Component
-export function HeroCopy() {
-      const [isPopupOpen, setIsPopupOpen] = useState(false);
+function HeroCopy() {
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   return (
     <div>
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <Pill>
           <Sparkles className="h-3.5 w-3.5" />
           Local-First · Autonomous · Free Forever
@@ -24,12 +28,12 @@ export function HeroCopy() {
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55, delay: 0.08 }}
-        className="acv-display mt-5 text-[38px] font-bold leading-[1.1] tracking-tight text-[#14142B] sm:text-[44px]"
+        className="acv-display mt-5 text-[38px] font-bold leading-[1.1] tracking-tight text-[var(--acv-ink)] sm:text-[44px]"
       >
         Your AI Agent.
         <br />
         Runs on{" "}
-        <span className="bg-gradient-to-r from-[#6552E8] to-[#8B5CF6] bg-clip-text text-transparent">
+        <span className="acv-serif bg-gradient-to-r from-[#6552E8] to-[#8B5CF6] bg-clip-text text-transparent">
           Your Machine.
         </span>
       </motion.h1>
@@ -38,12 +42,11 @@ export function HeroCopy() {
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55, delay: 0.16 }}
-        className="mt-4 max-w-lg text-[15.5px] leading-relaxed text-[#5B5B76]"
+        className="mt-4 max-w-lg text-[15.5px] leading-relaxed text-[var(--acv-ink-soft)]"
       >
-        Download the agent, connect your background once. It scrapes job
-        boards every morning at 9am, tailors your resume with local AI, and
-        builds a structured library of every version — nothing leaves your
-        computer.
+        Download the agent, connect your background once. It scrapes job boards
+        every morning at 9am, tailors your resume with local AI, and builds a
+        structured library of every version — nothing leaves your computer.
       </motion.p>
 
       <motion.div
@@ -54,10 +57,15 @@ export function HeroCopy() {
       >
         {HERO_BULLETS.map((item) => (
           <div key={item.title} className="flex items-center gap-2">
-            <div className="flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-[#EDEBFC]">
-              <item.icon className="h-3.5 w-3.5 text-[#6552E8]" strokeWidth={2.25} />
+            <div className="flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-[#6552E8]/12">
+              <item.icon
+                className="h-3.5 w-3.5 text-[#6552E8]"
+                strokeWidth={2.25}
+              />
             </div>
-            <p className="text-[13px] font-semibold text-[#14142B]">{item.title}</p>
+            <p className="text-[13px] font-semibold text-[var(--acv-ink)]">
+              {item.title}
+            </p>
           </div>
         ))}
       </motion.div>
@@ -69,9 +77,9 @@ export function HeroCopy() {
         className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center"
       >
         <PrimaryButton onClick={()=>setIsPopupOpen(true)}>
-          <Download className="h-4.5 w-4.5" strokeWidth={2.5} />
+          <Download className="h-[18px] w-[18px]" strokeWidth={2.5} />
           Download for {OS_LABEL}
-        </PrimaryButton>
+        </PrimaryButton >
         <SecondaryButton href="#how-it-works" onClick={()=>setIsPopupOpen(true)}>
           See How It Works
           <ArrowRight className="h-4 w-4" />
@@ -85,23 +93,26 @@ export function HeroCopy() {
         className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2"
       >
         {TRUST_ROW.map((item) => (
-          <div key={item.label} className="flex items-center gap-1.5 text-[13px] font-medium text-[#5B5B76]">
+          <div
+            key={item.label}
+            className="flex items-center gap-1.5 text-[13px] font-medium text-[var(--acv-ink-soft)]"
+          >
             <item.icon className="h-4 w-4 text-[#17A34A]" />
             {item.label}
           </div>
         ))}
       </motion.div>
-                <WaitlistPopup 
+      <WaitlistPopup 
         isOpen={isPopupOpen} 
         onClose={() => setIsPopupOpen(false)} 
       />
-
     </div>
   );
 }
 
 // Hero Visual Components
 function HudFrame({ className = "" }) {
+  /* Four corner brackets — the "targeting reticle" framing device */
   const corner = "absolute h-3 w-3 border-[#8B78F0]";
   return (
     <div className={`pointer-events-none absolute inset-0 ${className}`}>
@@ -113,20 +124,34 @@ function HudFrame({ className = "" }) {
   );
 }
 
-function InputCard({ iconBg, chipIcon: ChipIcon, title, chipLabel, buttonLabel, buttonColor, footnote }) {
-  
-    return (
+function InputCard({
+  iconBg,
+  chipIcon: ChipIcon,
+  title,
+  chipLabel,
+  buttonLabel,
+  buttonColor,
+  footnote,
+}) {
+  return (
     <div className="acv-mono w-full max-w-[168px] rounded-lg border border-white/10 bg-white/[0.04] p-3 backdrop-blur-sm">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-[#9D96D9]">{title}</p>
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-[#9D96D9]">
+        {title}
+      </p>
       <div className="mt-2 flex items-center gap-1.5 rounded-md border border-white/5 bg-black/20 px-2 py-1.5">
-        <div className={`flex h-5 w-5 flex-none items-center justify-center rounded ${iconBg}`}>
+        <div
+          className={`flex h-5 w-5 flex-none items-center justify-center rounded ${iconBg}`}
+        >
           <ChipIcon className="h-3 w-3 text-white" strokeWidth={2.5} />
         </div>
         <span className="truncate text-[10px] text-[#D8D5F0]">{chipLabel}</span>
       </div>
       <button
         className="mt-2 w-full rounded-md px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-white transition hover:brightness-110"
-        style={{ backgroundColor: buttonColor, boxShadow: `0 0 16px -4px ${buttonColor}` }}
+        style={{
+          backgroundColor: buttonColor,
+          boxShadow: `0 0 16px -4px ${buttonColor}`,
+        }}
       >
         {buttonLabel}
       </button>
@@ -136,8 +161,6 @@ function InputCard({ iconBg, chipIcon: ChipIcon, title, chipLabel, buttonLabel, 
           {footnote}
         </p>
       )}
-    
-
     </div>
   );
 }
@@ -158,7 +181,9 @@ function StatusList() {
               : "border-[#3B2E7A] bg-[#1A1440]"
           }`}
         >
-          <span className={`text-[9.5px] uppercase tracking-wide ${step.done ? "text-[#7FD9A4]" : "text-[#B8AFF0]"}`}>
+          <span
+            className={`text-[9.5px] uppercase tracking-wide ${step.done ? "text-[#7FD9A4]" : "text-[#B8AFF0]"}`}
+          >
             {step.label}
             {!step.done && <span className="acv-blink">_</span>}
           </span>
@@ -177,14 +202,20 @@ function AgentNode() {
   return (
     <div className="relative flex flex-col items-center gap-2">
       <div className="relative flex h-[76px] w-[76px] items-center justify-center">
+        {/* Rotating dashed rings */}
         <div className="acv-orbit-slow absolute inset-0 rounded-full border border-dashed border-[#8B78F0]/40" />
         <div className="acv-orbit-fast absolute inset-[8px] rounded-full border border-dashed border-[#34D399]/30" />
+        {/* Orbiting particles */}
         <div className="acv-orbit-slow absolute inset-0">
           <span className="absolute left-1/2 top-0 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-[#8B78F0] shadow-[0_0_8px_2px_rgba(139,120,240,0.7)]" />
         </div>
-        <div className="acv-orbit-fast absolute inset-[8px]" style={{ animationDirection: "reverse" }}>
+        <div
+          className="acv-orbit-fast absolute inset-[8px]"
+          style={{ animationDirection: "reverse" }}
+        >
           <span className="absolute left-1/2 top-0 h-1 w-1 -translate-x-1/2 rounded-full bg-[#34D399] shadow-[0_0_6px_2px_rgba(52,211,153,0.7)]" />
         </div>
+        {/* Core */}
         <div className="acv-glow-pulse-dark flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-[#2A2456] to-[#12102B] ring-1 ring-[#8B78F0]/50">
           <Bot className="h-5 w-5 text-[#B8AFF0]" strokeWidth={1.75} />
         </div>
@@ -196,7 +227,6 @@ function AgentNode() {
     </div>
   );
 }
-
 function OutputResumeCard() {
   return (
     <div className="relative w-full max-w-[240px] rounded-lg bg-white p-4 shadow-[0_0_0_1px_rgba(139,120,240,0.5),0_20px_45px_-16px_rgba(139,120,240,0.55)]">
@@ -222,16 +252,23 @@ function OutputResumeCard() {
         </div>
       </div>
 
-      <p className="mt-3 text-[9px] font-bold tracking-wide text-[#8B899E]">PROFESSIONAL SUMMARY</p>
+      <p className="mt-3 text-[9px] font-bold tracking-wide text-[#8B899E]">
+        PROFESSIONAL SUMMARY
+      </p>
       <p className="mt-1 text-[10px] leading-relaxed text-[#3F3D56]">
         PM with 6+ years building user-centric products that drive growth,
         leading cross-functional teams end to end.
       </p>
 
-      <p className="mt-2.5 text-[9px] font-bold tracking-wide text-[#8B899E]">SKILLS</p>
+      <p className="mt-2.5 text-[9px] font-bold tracking-wide text-[#8B899E]">
+        SKILLS
+      </p>
       <div className="mt-1 flex flex-wrap gap-1">
         {["Strategy", "Data Analysis", "Roadmapping", "SQL"].map((skill) => (
-          <span key={skill} className="rounded-md bg-[#F7F6FC] px-1.5 py-0.5 text-[9px] font-medium text-[#5B5B76]">
+          <span
+            key={skill}
+            className="rounded-md bg-[#F7F6FC] px-1.5 py-0.5 text-[9px] font-medium text-[#5B5B76]"
+          >
             {skill}
           </span>
         ))}
@@ -247,7 +284,9 @@ function StoredResumeThumbs() {
         <div
           key={i}
           className={`relative h-12 w-10 flex-none rounded-md border bg-white/95 p-1 ${
-            i === 1 ? "border-2 border-[#8B78F0] shadow-[0_0_10px_-1px_rgba(139,120,240,0.7)]" : "border-white/10"
+            i === 1
+              ? "border-2 border-[#8B78F0] shadow-[0_0_10px_-1px_rgba(139,120,240,0.7)]"
+              : "border-white/10"
           }`}
         >
           <div className="h-1 w-4 rounded-sm bg-[#E1DFF3]" />
@@ -268,7 +307,12 @@ function StoredResumeThumbs() {
 
 function FlowArrow() {
   return (
-    <svg width="36" height="24" viewBox="0 0 36 24" className="hidden flex-none sm:block">
+    <svg
+      width="36"
+      height="24"
+      viewBox="0 0 36 24"
+      className="hidden flex-none sm:block"
+    >
       <defs>
         <linearGradient id="acv-flow-grad" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#8B78F0" />
@@ -276,30 +320,44 @@ function FlowArrow() {
         </linearGradient>
       </defs>
       <line
-        x1="2" y1="12" x2="30" y2="12"
-        stroke="url(#acv-flow-grad)" strokeWidth="2"
+        x1="2"
+        y1="12"
+        x2="30"
+        y2="12"
+        stroke="url(#acv-flow-grad)"
+        strokeWidth="2"
         className="acv-dash-path"
       />
-      <path d="M24 6 L32 12 L24 18" fill="none" stroke="#34D399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M24 6 L32 12 L24 18"
+        fill="none"
+        stroke="#34D399"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
 
-export function HeroVisual() {
+ function HeroVisual() {
   return (
     <div className="relative overflow-hidden rounded-[24px] border border-[#3B2E7A]/60 bg-gradient-to-br from-[#0B0B1F] via-[#12102B] to-[#1A1440] p-4 shadow-[0_30px_60px_-25px_rgba(101,82,232,0.45)] sm:p-6">
+      {/* Ambient grid + glow backdrop */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.25]"
         style={{
           backgroundImage:
             "linear-gradient(rgba(139,120,240,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(139,120,240,0.5) 1px, transparent 1px)",
           backgroundSize: "26px 26px",
-          maskImage: "radial-gradient(ellipse at center, black 30%, transparent 75%)",
+          maskImage:
+            "radial-gradient(ellipse at center, black 30%, transparent 75%)",
         }}
       />
       <div className="pointer-events-none absolute -top-16 left-1/2 h-56 w-56 -translate-x-1/2 rounded-full bg-[#6552E8] opacity-30 blur-3xl" />
       <div className="acv-scanline pointer-events-none absolute inset-x-0 h-24 bg-gradient-to-b from-transparent via-[#8B78F0]/10 to-transparent" />
 
+      {/* Status chrome */}
       <div className="acv-mono relative mb-4 flex items-center justify-between text-[10px] uppercase tracking-wider text-[#726CAA]">
         <span className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#34D399]" />
@@ -308,6 +366,7 @@ export function HeroVisual() {
         <span>Local Runtime · No Network</span>
       </div>
 
+      {/* Row 1 — inputs -> agent -> status */}
       <div className="relative flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-center sm:gap-2">
         <div className="flex flex-col items-center gap-3">
           <InputCard
@@ -336,6 +395,7 @@ export function HeroVisual() {
         <StatusList />
       </div>
 
+      {/* Row 2 — output */}
       <div className="relative mt-5 flex flex-col items-center border-t border-dashed border-white/10 pt-6">
         <OutputResumeCard />
         <StoredResumeThumbs />
@@ -343,3 +403,5 @@ export function HeroVisual() {
     </div>
   );
 }
+
+export {HeroVisual, HeroCopy}

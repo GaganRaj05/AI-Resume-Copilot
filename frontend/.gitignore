@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 .env
 
+src/LandingPage.jsx
+Landing.css
+

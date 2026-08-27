@@ -1,5 +1,6 @@
 const logger = require('../config/logger');
 const EarlyUsers = require('../models/Early_Users')
+const {emailQueue} = require('../queues')
 
 const saveEarlyUser = async(req, res)=> {
     try{
@@ -11,6 +12,11 @@ const saveEarlyUser = async(req, res)=> {
             
         await EarlyUsers.create({
             email,
+        })
+
+        await emailQueue.add('emails.onboarding', {
+            receiver:email,
+            email_type:'onboarding'
         })
 
         return res.status(201).json({"success":true, "msg":"Signup successfull"});

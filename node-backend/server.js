@@ -1,15 +1,20 @@
 require('dotenv').config()
+
 const morgan = require('morgan')
 const helmet = require('helmet')
 const cors = require('cors')
 const express = require('express')
 const connectToDb = require('./utils/connectToDB');
+const {connectToRedis} = require('./utils/redis');
 const logger = require('./config/logger');
 const earlyRoutes = require('./routes/early');
 
 const {MONGODB_URL, ALLOWED_ORIGINS, PORT} = require('./config/settings')
 
 connectToDb(MONGODB_URL);
+connectToRedis();
+
+require('./queues')
 
 const app = express()
 app.use(helmet())

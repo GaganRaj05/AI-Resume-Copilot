@@ -1,60 +1,107 @@
 /* AgentCV Landing Page — supporting styles
-   Import once at the top of LandingPage.jsx:  import "./landing.css";
+   Import once at the top of LandingPage.jsx:  import "./Landing.css";
 
    Requires Tailwind CSS (v3+) already set up in the host project.
 
-   Fonts: Sora (display/headings) + Inter (body/UI) + Fraunces (italic serif
-   accent word in headings) + JetBrains Mono (hero HUD readouts + numbered
-   eyebrows). Add to your index.html <head> (or _document):
+   Design direction: stark print. Pure black ink on a pure white canvas,
+   one hot-red signal color used only where something needs to interrupt
+   (a live badge, a single word in a headline), flat 1px hairline borders
+   instead of shadows, and a single oversized display face doing almost
+   all of the emotional work. No glass, no gradients, no soft blur.
+
+   Fonts: Archivo (display/headlines, weight 900 only) + Inter (body/UI)
+   + IBM Plex Mono (data readouts, eyebrows, nav labels). Add to your
+   index.html <head>:
 
    <link rel="preconnect" href="https://fonts.googleapis.com">
    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&family=Fraunces:ital,wght@1,500;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Archivo:wght@700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 */
 
 /* ------------------------------------------------------------------ */
-/*  Theme tokens — light default, dark override via .dark on the same  */
-/*  element that carries .acv-font (see LandingPage's root wrapper).   */
-/*  Only page-chrome (nav, section backgrounds, body copy) is theme-   */
-/*  aware; the hero's agent console and the final-CTA banner stay      */
-/*  intentionally dark in both modes, like a permanently-dark terminal */
-/*  panel inside a light app.                                          */
+/*  Theme tokens                                                       */
 /* ------------------------------------------------------------------ */
 
 .acv-font {
-  --acv-bg: #F6F5FC;
+  /* canvas */
+  --acv-bg: #FFFFFF;
+  --acv-bg-flat: #F6F6F5;
   --acv-surface: #FFFFFF;
-  --acv-surface-alt: #F9F8FE;
-  --acv-surface-highlight: #FAFAFE;
-  --acv-border: #ECEAF8;
-  --acv-border-soft: #F0EFF8;
-  --acv-ink: #14142B;
-  --acv-ink-medium: #3F3D56;
-  --acv-ink-soft: #5B5B76;
-  --acv-ink-faint: #8B899E;
-  --acv-nav-bg: rgba(246, 245, 252, 0.85);
+  --acv-surface-alt: #F1F1EF;
+
+  /* ink */
+  --acv-ink: #0C0C0D;
+  --acv-ink-medium: #47474B;
+  --acv-ink-soft: #6E6E73;
+  --acv-ink-faint: #9C9CA1;
+  --acv-ink-on-dark: #FFFFFF;
+
+  /* borders — hairlines, not shadows */
+  --acv-border: rgba(12, 12, 13, 0.14);
+  --acv-border-soft: rgba(12, 12, 13, 0.08);
+  --acv-border-strong: rgba(12, 12, 13, 0.9);
+
+  /* the one accent — a hot signal red, used with extreme restraint */
+  --acv-accent: #FF3B1F;
+  --acv-accent-ink: #D62B10;
+  --acv-accent-soft: rgba(255, 59, 31, 0.1);
+  --acv-accent-line: rgba(255, 59, 31, 0.35);
+
+  /* secondary hue reserved only for "confirmed / free / local" signal */
+  --acv-signal: #1C8F63;
+  --acv-signal-soft: rgba(28, 143, 99, 0.1);
+
+  --acv-nav-bg: rgba(255, 255, 255, 0.82);
+  --acv-shadow-card: 0 14px 28px -18px rgba(12, 12, 13, 0.22), 0 3px 8px -3px rgba(12, 12, 13, 0.1);
+  --acv-shadow-card-hover: 0 20px 38px -18px rgba(12, 12, 13, 0.28), 0 4px 10px -3px rgba(12, 12, 13, 0.14);
+  --acv-shadow-pop: 0 20px 44px -22px rgba(12, 12, 13, 0.35);
+  --acv-shadow-chip: 0 6px 14px -8px rgba(12, 12, 13, 0.18);
+
+  /* Fixed "highest contrast" pair for solid ink-block surfaces (final CTA,
+     dark mockups). Deliberately NOT redefined in .acv-font.dark below —
+     --acv-ink/--acv-ink-on-dark flip per theme (they're for text color on
+     the page), but a block that's meant to always read as a solid dark
+     panel with light text needs values that stay put in both themes. */
+  --acv-contrast-bg: #0C0C0D;
+  --acv-contrast-fg: #FFFFFF;
 
   font-family: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
 .acv-font.dark {
-  --acv-bg: #0D0C1F;
-  --acv-surface: #16142E;
-  --acv-surface-alt: #1B1938;
-  --acv-surface-highlight: #1F1C42;
-  --acv-border: #2A2650;
-  --acv-border-soft: #241F48;
-  --acv-ink: #F5F4FC;
-  --acv-ink-medium: #C7C4E3;
-  --acv-ink-soft: #A9A6C9;
-  --acv-ink-faint: #8481A8;
-  --acv-nav-bg: rgba(13, 12, 31, 0.8);
+  --acv-bg: #0A0A0B;
+  --acv-bg-flat: #101011;
+  --acv-surface: #131314;
+  --acv-surface-alt: #18181A;
+
+  --acv-ink: #FAFAF9;
+  --acv-ink-medium: #C9C9CD;
+  --acv-ink-soft: #99999F;
+  --acv-ink-faint: #67676C;
+  --acv-ink-on-dark: #FAFAF9;
+
+  --acv-border: rgba(255, 255, 255, 0.14);
+  --acv-border-soft: rgba(255, 255, 255, 0.08);
+  --acv-border-strong: rgba(255, 255, 255, 0.92);
+
+  --acv-accent: #FF5540;
+  --acv-accent-ink: #FF7A68;
+  --acv-accent-soft: rgba(255, 85, 64, 0.14);
+  --acv-accent-line: rgba(255, 85, 64, 0.38);
+
+  --acv-signal: #38D999;
+  --acv-signal-soft: rgba(56, 217, 153, 0.14);
+
+  --acv-nav-bg: rgba(10, 10, 11, 0.78);
+  --acv-shadow-card: 0 14px 30px -16px rgba(0, 0, 0, 0.6), 0 3px 10px -3px rgba(0, 0, 0, 0.45);
+  --acv-shadow-card-hover: 0 22px 42px -18px rgba(0, 0, 0, 0.68), 0 4px 12px -3px rgba(0, 0, 0, 0.5);
+  --acv-shadow-pop: 0 24px 50px -20px rgba(0, 0, 0, 0.65);
+  --acv-shadow-chip: 0 6px 16px -8px rgba(0, 0, 0, 0.5);
 }
 
-/* Smooth crossfade on toggle, scoped to color-ish properties only so it
-   never fights framer-motion's transform-based animations. */
+/* Smooth crossfade on theme toggle, scoped to color-ish props only */
 .acv-font, .acv-font *, .acv-font *::before, .acv-font *::after {
-  transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 @media (prefers-reduced-motion: reduce) {
   .acv-font, .acv-font *, .acv-font *::before, .acv-font *::after {
@@ -63,50 +110,97 @@
 }
 
 .acv-display {
-  font-family: "Sora", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.03em;
 }
 .acv-mono {
-  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-}
-.acv-serif {
-  font-family: "Fraunces", ui-serif, Georgia, serif;
-  font-style: italic;
-  font-weight: 500;
+  font-family: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 }
 
-/* Fine dot-grid texture for section backdrops — echoes the hero's grid at
-   a much lower intensity so light sections don't feel like flat cutouts. */
+/* ------------------------------------------------------------------ */
+/*  Flat surfaces — hairline borders instead of glass/shadow            */
+/* ------------------------------------------------------------------ */
+
+/* Standard flat panel — the workhorse surface for cards */
+.acv-panel {
+  background: var(--acv-surface);
+  border: 1px solid var(--acv-border-soft);
+  box-shadow: var(--acv-shadow-card);
+  transition: box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+.acv-panel:hover {
+  box-shadow: var(--acv-shadow-card-hover);
+}
+
+/* Nav bar surface — a soft glass bar even at the very top of the page
+   (so it visibly reads as pinned/stuck), intensifying into a fuller
+   blurred surface once .is-scrolled is toggled on scroll. */
+.acv-nav-surface {
+  background: var(--acv-nav-bg);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--acv-border-soft);
+  transition: background-color 0.45s ease, backdrop-filter 0.45s ease,
+    -webkit-backdrop-filter 0.45s ease, border-color 0.45s ease, box-shadow 0.45s ease;
+}
+.acv-nav-surface.is-scrolled {
+  background: var(--acv-nav-bg);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-bottom-color: var(--acv-border-soft);
+}
+@media (prefers-reduced-motion: reduce) {
+  .acv-nav-surface {
+    transition: none;
+  }
+}
+
+/* Small nested chips inside a panel (mono labels, tags) */
+.acv-chip {
+  background: var(--acv-bg-flat);
+  border: 1px solid var(--acv-border-soft);
+  box-shadow: var(--acv-shadow-chip);
+}
+
+/* Solid ink block — for the highest-contrast surfaces (final CTA, dark mockups).
+   Uses the fixed --acv-contrast-* pair (not --acv-ink/--acv-ink-on-dark, which
+   flip per theme) so it stays a true dark panel with light text in both
+   light and dark mode instead of collapsing to white-on-white in dark mode. */
+.acv-ink-block {
+  background: var(--acv-contrast-bg);
+  color: var(--acv-contrast-fg);
+}
+
+/* Ghosted / faint decorative UI, sits behind the headline in the hero */
+.acv-ghost {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+.dark .acv-ghost {
+  opacity: 0.35;
+}
+
+/* Fine dot-grid texture for section backdrops */
 .acv-dotgrid {
   position: relative;
   isolation: isolate;
 }
-
 .acv-dotgrid::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
-
-  background-image: radial-gradient(
-    var(--acv-border) 1.2px,
-    transparent 1.2px
-  );
+  background-image: radial-gradient(var(--acv-border) 1px, transparent 1px);
   background-size: 22px 22px;
-
-  -webkit-mask-image: radial-gradient(
-    ellipse 70% 60% at 50% 0%,
-    black 40%,
-    transparent 85%
-  );
-
-  mask-image: radial-gradient(
-    ellipse 70% 60% at 50% 0%,
-    black 40%,
-    transparent 85%
-  );
+  -webkit-mask-image: radial-gradient(ellipse 65% 55% at 50% 0%, black 35%, transparent 80%);
+  mask-image: radial-gradient(ellipse 65% 55% at 50% 0%, black 35%, transparent 80%);
 }
 
-/* Button shine sweep on hover */
+/* ------------------------------------------------------------------ */
+/*  Buttons + interaction                                              */
+/* ------------------------------------------------------------------ */
+
 .acv-shine {
   position: relative;
   overflow: hidden;
@@ -123,144 +217,234 @@
   transform: translateX(120%);
 }
 
-@keyframes acv-float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
+@keyframes acv-pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
-.acv-float {
-  animation: acv-float 4.5s ease-in-out infinite;
-}
-
-@keyframes acv-glow-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(23, 163, 74, 0.35); }
-  50% { box-shadow: 0 0 0 14px rgba(23, 163, 74, 0); }
-}
-.acv-glow-pulse {
-  animation: acv-glow-pulse 2.4s ease-out infinite;
+.acv-pulse-dot {
+  animation: acv-pulse-dot 1.8s ease-in-out infinite;
 }
 
-@keyframes acv-dash {
-  to { stroke-dashoffset: 0; }
-}
-.acv-dash-path {
-  stroke-dasharray: 6 6;
-  stroke-dashoffset: 240;
-  animation: acv-dash 6s linear infinite;
-}
+/* ------------------------------------------------------------------ */
+/*  Marquee ticker                                                     */
+/* ------------------------------------------------------------------ */
 
-@keyframes acv-spin {
-  to { transform: rotate(360deg); }
-}
-.acv-spin {
-  animation: acv-spin 1s linear infinite;
-}
-
-@keyframes acv-marquee {
+@keyframes acv-ticker {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
-.acv-marquee-track {
-  animation: acv-marquee 26s linear infinite;
+.acv-ticker-track {
+  animation: acv-ticker 26s linear infinite;
 }
-.acv-marquee-track:hover {
-  animation-play-state: paused;
-}
-.acv-marquee-track-reverse {
-  animation: acv-marquee 30s linear infinite reverse;
-}
-.acv-marquee-track-reverse:hover {
+.acv-ticker-track:hover {
   animation-play-state: paused;
 }
 
-/* Hero visual — dark "agent console" panel */
-.acv-scanline {
-  animation: acv-scan 5s ease-in-out infinite;
+/* ------------------------------------------------------------------ */
+/*  Reviews marquee                                                     */
+/* ------------------------------------------------------------------ */
+
+@keyframes acv-review-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
-@keyframes acv-scan {
-  0% { transform: translateY(-20%); opacity: 0; }
-  15% { opacity: 1; }
-  85% { opacity: 1; }
-  100% { transform: translateY(320%); opacity: 0; }
+.acv-review-track {
+  animation: acv-review-scroll 46s linear infinite;
+  width: max-content;
+}
+.acv-review-track:hover {
+  animation-play-state: paused;
 }
 
-.acv-orbit-slow {
-  animation: acv-orbit 7s linear infinite;
-}
-.acv-orbit-fast {
-  animation: acv-orbit 3.2s linear infinite;
-}
-@keyframes acv-orbit {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+/* Fades the marquee out at the left/right edges of its container so
+   cards don't hard-clip against the section padding. */
+.acv-marquee-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 6%, black 94%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, black 6%, black 94%, transparent 100%);
 }
 
-.acv-glow-pulse-dark {
-  animation: acv-glow-pulse-dark 2.6s ease-in-out infinite;
-}
-@keyframes acv-glow-pulse-dark {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(139, 120, 240, 0.5), 0 0 18px 2px rgba(139, 120, 240, 0.35); }
-  50% { box-shadow: 0 0 0 10px rgba(139, 120, 240, 0), 0 0 26px 6px rgba(139, 120, 240, 0.55); }
+@media (prefers-reduced-motion: reduce) {
+  .acv-review-track {
+    animation: none;
+  }
 }
 
-.acv-blink {
-  animation: acv-blink 1s step-end infinite;
+/* ------------------------------------------------------------------ */
+/*  Paper-grain hero backdrop + registration marks                     */
+/*  (replaces the generic dot-grid — a texture and a device that       */
+/*   both come from the "stark print" brief instead of a stock pattern) */
+/* ------------------------------------------------------------------ */
+
+.acv-noise {
+  position: relative;
+  isolation: isolate;
 }
-@keyframes acv-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+.acv-noise::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 20%, black 0%, transparent 78%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 20%, black 0%, transparent 78%);
+}
+.dark .acv-noise::before {
+  opacity: 0.7;
+  mix-blend-mode: screen;
+}
+
+.acv-crop-mark {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  color: var(--acv-ink-faint);
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Ticket / receipt card — perforated edges + rubber-stamp accent     */
+/* ------------------------------------------------------------------ */
+
+.acv-ticket {
+  position: relative;
+}
+.acv-ticket::before,
+.acv-ticket::after {
+  content: "";
+  position: absolute;
+  top: var(--notch-y, 50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--acv-bg);
+  transform: translateY(-50%);
+  z-index: 2;
+}
+.acv-ticket::before { left: -11px; }
+.acv-ticket::after { right: -11px; }
+
+.acv-perforation {
+  border-top: 1.5px dashed var(--acv-border);
+}
+
+.acv-stamp {
+  border: 2.5px solid var(--acv-accent);
+  color: var(--acv-accent);
+  border-radius: 10px;
+  transform: rotate(-9deg);
+  mix-blend-mode: multiply;
+}
+.dark .acv-stamp {
+  mix-blend-mode: normal;
 }
 
 @keyframes acv-pop {
-  0% { transform: scale(0.9); opacity: 0; }
+  0% { transform: scale(0.94); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }
 .acv-pop {
   animation: acv-pop 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+@keyframes acv-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.acv-float {
+  animation: acv-float 6s ease-in-out infinite;
+}
+
 /* Respect reduced-motion preference */
 @media (prefers-reduced-motion: reduce) {
-  .acv-float, .acv-glow-pulse, .acv-dash-path, .acv-spin, .acv-marquee-track,
-  .acv-marquee-track-reverse, .acv-pop, .acv-scanline, .acv-orbit-slow,
-  .acv-orbit-fast, .acv-glow-pulse-dark, .acv-blink, .acv-ticker-track {
+  .acv-pop, .acv-pulse-dot, .acv-float {
     animation: none !important;
   }
 }
 
-/* Slim ticker bar under the navbar */
-@keyframes acv-ticker {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+/* ------------------------------------------------------------------ */
+/*  Neomorphism — soft-UI shadows for every section except the hero    */
+/*                                                                      */
+/*  True neumorphism only reads correctly when a surface and its       */
+/*  parent share the same flat color and depth comes purely from a     */
+/*  light-source/shadow pair, so every element below opts in via the   */
+/*  `.acv-neo-zone` scope rather than being restyled globally — the    */
+/*  hero keeps its stark-print hairlines and flat panels untouched.    */
+/* ------------------------------------------------------------------ */
+
+.acv-font {
+  --acv-neo-light: rgba(255, 255, 255, 0.85);
+  --acv-neo-dark: rgba(12, 12, 13, 0.16);
+  --acv-neo-light-sm: rgba(255, 255, 255, 0.9);
+  --acv-neo-dark-sm: rgba(12, 12, 13, 0.13);
 }
-.acv-ticker-track {
-  animation: acv-ticker 22s linear infinite;
+.acv-font.dark {
+  --acv-neo-light: rgba(255, 255, 255, 0.045);
+  --acv-neo-dark: rgba(0, 0, 0, 0.7);
+  --acv-neo-light-sm: rgba(255, 255, 255, 0.05);
+  --acv-neo-dark-sm: rgba(0, 0, 0, 0.6);
 }
 
-.acv-dotgrid {
-  position: relative;
-  isolation: isolate;
+/* Raised "outdent" cards — the default state for any .acv-panel that
+   lives inside a neomorphic zone. No border: the dual shadow alone
+   reads as depth against the matching flat background. */
+.acv-neo-zone .acv-panel {
+  background: var(--acv-bg-flat);
+  border: none;
+  box-shadow: 9px 9px 20px var(--acv-neo-dark), -9px -9px 20px var(--acv-neo-light);
+  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
+.acv-neo-zone .acv-panel:hover {
+  box-shadow: 12px 12px 26px var(--acv-neo-dark), -12px -12px 26px var(--acv-neo-light);
 }
 
-.acv-dotgrid::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
+/* Small raised chips — eyebrow badges, theme toggle, social icons */
+.acv-neo-zone .acv-chip {
+  background: var(--acv-bg-flat);
+  border: none;
+  box-shadow: 5px 5px 12px var(--acv-neo-dark-sm), -5px -5px 12px var(--acv-neo-light-sm);
+  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
 
-  background-image: radial-gradient(
-    var(--acv-border) 1.2px,
-    transparent 1.2px
-  );
-  background-size: 22px 22px;
+/* Nav-link pill acts as a sunken groove; individual links emboss up
+   on hover, like a pressable key lifting out of the well. */
+.acv-neo-zone .acv-chip:has(a) {
+  box-shadow: inset 4px 4px 9px var(--acv-neo-dark-sm), inset -4px -4px 9px var(--acv-neo-light-sm);
+}
+.acv-neo-zone .acv-chip a {
+  border-radius: 999px;
+  transition: box-shadow 0.25s ease, background-color 0.25s ease;
+}
+.acv-neo-zone .acv-chip a:hover {
+  background: var(--acv-bg-flat);
+  box-shadow: 4px 4px 10px var(--acv-neo-dark-sm), -4px -4px 10px var(--acv-neo-light-sm);
+}
 
-  -webkit-mask-image: radial-gradient(
-    ellipse 70% 60% at 50% 0%,
-    black 40%,
-    transparent 85%
-  );
-  mask-image: radial-gradient(
-    ellipse 70% 60% at 50% 0%,
-    black 40%,
-    transparent 85%
-  );
+/* Embossed icon tiles inside neo cards */
+.acv-neo-icon {
+  background: var(--acv-bg-flat);
+  border: none;
+  box-shadow: 5px 5px 12px var(--acv-neo-dark-sm), -5px -5px 12px var(--acv-neo-light-sm);
+}
+
+/* Pressed / inset wells — for grouped table headers, dividers, sunken rows */
+.acv-neo-inset {
+  background: var(--acv-bg-flat);
+  border: none;
+  box-shadow: inset 6px 6px 14px var(--acv-neo-dark), inset -6px -6px 14px var(--acv-neo-light);
+}
+
+/* Final CTA ink block: keeps its solid brand-black fill for contrast,
+   but still lifts off the matching flat page background around it. */
+.acv-neo-zone .acv-ink-block {
+  box-shadow: 16px 16px 36px var(--acv-neo-dark), -6px -6px 22px var(--acv-neo-light);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .acv-neo-zone .acv-panel,
+  .acv-neo-zone .acv-chip,
+  .acv-neo-zone .acv-chip a {
+    transition: none;
+  }
 }

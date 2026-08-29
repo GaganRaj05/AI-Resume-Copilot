@@ -1,15 +1,7 @@
-import { useState } from 'react'
-import './App.css'
-import Home from './pages/Home';
 import LandingPage from './LandingPage';
-
+import Home from './pages/Home'
 function App() {
-
-  return (
-    <>
-    <LandingPage/>
-    </>
-  )
+  return <Home />;
 }
 
 export default App

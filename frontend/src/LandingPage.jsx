@@ -707,13 +707,21 @@ function ResumeTicket() {
 }
 
 function HeroSection() {
+  const heroRef = useRef(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const heroTextY = useTransform(scrollYProgress, [0, 1], [0, 160]);
+  const heroTextOpacity = useTransform(scrollYProgress, [0, 0.55, 1], [1, 1, 0]);
+
   return (
-    <section className="acv-noise relative overflow-hidden">
+    <section ref={heroRef} className="acv-noise relative overflow-hidden">
       <div className="relative mx-auto max-w-7xl px-6 pb-10 pt-16 lg:px-10 lg:pb-16 lg:pt-20">
         <CropMarks />
         <HeroGhostMock />
 
-        <div className="relative mx-auto max-w-4xl text-center">
+        <motion.div
+          style={{ y: heroTextY, opacity: heroTextOpacity }}
+          className="relative mx-auto max-w-4xl text-center"
+        >
           <HeroBadge />
 
           <motion.h1
@@ -789,7 +797,7 @@ function HeroSection() {
           >
             Free forever · Runs fully offline · Export to PDF
           </motion.p>
-        </div>
+        </motion.div>
 
         <ResumeTicket />
       </div>

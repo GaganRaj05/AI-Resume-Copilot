@@ -8,14 +8,43 @@ import { ArrowRight, Lock } from 'lucide-react';
 
 function CropMarks() {
   const Mark = ({ className }) => (
-    <svg viewBox="0 0 18 18" className={`acv-crop-mark ${className}`} aria-hidden="true">
-      <line x1="9" y1="0" x2="9" y2="18" stroke="currentColor" strokeWidth="1" />
-      <line x1="0o" y1="9" x2="18" y2="9" stroke="currentColor" strokeWidth="1" />
-      <circle cx="9" cy="9" r="4.5" fill="none" stroke="currentColor" strokeWidth="1" />
+    <svg
+      viewBox="0 0 18 18"
+      className={`acv-crop-mark ${className}`}
+      aria-hidden="true"
+    >
+      <line
+        x1="9"
+        y1="0"
+        x2="9"
+        y2="18"
+        stroke="currentColor"
+        strokeWidth="1"
+      />
+      <line
+        x1="0"
+        y1="9"
+        x2="18"
+        y2="9"
+        stroke="currentColor"
+        strokeWidth="1"
+      />
+      <circle
+        cx="9"
+        cy="9"
+        r="4.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1"
+      />
     </svg>
   );
+
   return (
-    <div className="pointer-events-none absolute inset-0 hidden sm:block" aria-hidden="true">
+    <div
+      className="pointer-events-none absolute inset-0 hidden sm:block"
+      aria-hidden="true"
+    >
       <Mark className="left-4 top-4" />
       <Mark className="right-4 top-4" />
       <Mark className="bottom-4 left-4" />

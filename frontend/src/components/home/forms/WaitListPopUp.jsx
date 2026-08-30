@@ -10,6 +10,8 @@ import {
   Loader2,
 } from "lucide-react";
 import "../../../Landing.css"; // adjust path — should point at the same Landing.css used by LandingPage.jsx
+import { toast } from "react-toastify";
+import { early } from "../../../services/early";
 
 const WaitlistPopup = ({ isOpen, onClose }) => {
   const [email, setEmail] = useState("");
@@ -18,11 +20,6 @@ const WaitlistPopup = ({ isOpen, onClose }) => {
   const [error, setError] = useState("");
   const [theme, setTheme] = useState("light");
 
-  // Read theme independently (localStorage, falling back to system
-  // preference) so the popup stays in sync with the rest of the site
-  // without needing a prop from the parent. Re-checked every time the
-  // popup opens, plus on cross-tab storage changes and OS-level scheme
-  // changes.
   useEffect(() => {
     const readTheme = () => {
       try {
@@ -31,9 +28,7 @@ const WaitlistPopup = ({ isOpen, onClose }) => {
           setTheme(stored);
           return;
         }
-      } catch {
-        // localStorage unavailable — fall through to system preference
-      }
+      } catch {}
       const prefersDark =
         typeof window !== "undefined" &&
         window.matchMedia?.("(prefers-color-scheme: dark)").matches;
@@ -76,7 +71,20 @@ const WaitlistPopup = ({ isOpen, onClose }) => {
     setIsLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const response = await early({ email });
+      if (response?.error) {
+        if (response.error.msg === "Email Taken") {
+          toast.error("That email is already registered.");
+        } else if (response.error.msg === "To many requests try again") {
+          toast.error(
+            "Too many attempts. Please wait 10 minutes and try again.",
+          );
+        } else {
+          toast.error("We couldn't complete your request. Please try again in some time.");
+        }
+        setIsLoading(false);
+        return;
+      }
       setStep(2);
       setIsLoading(false);
     } catch (err) {
@@ -170,7 +178,7 @@ const WaitlistPopup = ({ isOpen, onClose }) => {
                         <h3 className="acv-display text-[19px] uppercase leading-[1] text-[var(--acv-ink)] sm:text-[21px]">
                           We're updating our scrapers
                         </h3>
-                        <p className="mt-0.5 text-[12.5px] text-[var(--acv-ink-faint)]">
+                        <p className="acv-display mt-0.5 text-[12.5px] text-[var(--acv-ink-faint)]">
                           Thanks for your interest in AgentCV
                         </p>
                       </div>
@@ -183,10 +191,10 @@ const WaitlistPopup = ({ isOpen, onClose }) => {
                       Scraper engine in progress
                     </div>
 
-                    <p className="mb-6 text-[13.5px] leading-relaxed text-[var(--acv-ink-soft)]">
-                      Our local job-board scrapers are still in the oven.
-                      Drop your email and we'll let you know the moment
-                      they're ready to run.
+                    <p className=" mb-6 text-[13.5px] leading-relaxed text-[var(--acv-ink-soft)]">
+                      Our local job-board scrapers are still in the oven. Drop
+                      your email and we'll let you know the moment they're ready
+                      to run.
                     </p>
 
                     <form onSubmit={handleSubmit} className="space-y-3">
@@ -280,14 +288,17 @@ const WaitlistPopup = ({ isOpen, onClose }) => {
                         You're on the list
                       </h3>
 
-                      <p className="max-w-sm text-[13.5px] leading-relaxed text-[var(--acv-ink-soft)]">
+                      <p className=" max-w-sm text-[13.5px] leading-relaxed text-[var(--acv-ink-soft)]">
                         Thanks for stopping by! We're still putting the
-                        finishing touches on our scrapers to bring you an
-                        even better experience. Stay tuned!
+                        finishing touches on our scrapers to bring you an even
+                        better experience. Stay tuned!
                       </p>
 
                       <div className="acv-chip mt-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-[12px] text-[var(--acv-ink-soft)]">
-                        <Sparkles size={14} style={{ color: "var(--acv-signal)" }} />
+                        <Sparkles
+                          size={14}
+                          style={{ color: "var(--acv-signal)" }}
+                        />
                         We'll email you the moment we're ready
                       </div>
 

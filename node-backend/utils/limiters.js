@@ -1,7 +1,7 @@
 const rateLimit = require('express-rate-limit');
 
 
-const LIMIT = 5;
+const LIMIT = 10;
 const WINDOW_SEC = 60 * 60
 
 const normalLimiter = rateLimit({

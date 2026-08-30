@@ -17,6 +17,7 @@ const config = {
   redis:{
     port:process.env?.REDIS_PORT || 6379,
     host:process.env?.REDIS_HOST || "localhost",
+    url:process.env?.REDIS_URL 
   },
   mail:{
     user:process.env?.GOOGLE_GMAIL_ID,
@@ -24,7 +25,7 @@ const config = {
   }
 };
 
-const requiredKeys = ['SECRET_KEY', 'MONGODB_URL', 'REDIS_PORT', 'REDIS_HOST', 'GOOGLE_APP_PASSWORD','GOOGLE_GMAIL_ID'];
+const requiredKeys = ['SECRET_KEY', 'MONGODB_URL', 'GOOGLE_APP_PASSWORD','GOOGLE_GMAIL_ID', 'REDIS_URL'];
 const missingKeys = requiredKeys.filter(key => !process.env[key]);
 
 if (missingKeys.length > 0) {
@@ -41,5 +42,6 @@ module.exports = {
   REDIS_PORT:config.redis.REDIS_PORT,
   config,
   GOOGLE_APP_PASSWORD:config.mail.pass,
-  GOOGLE_GMAIL_ID:config.mail.user
+  GOOGLE_GMAIL_ID:config.mail.user,
+  REDIS_URL:config.redis.url
 };

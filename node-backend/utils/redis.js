@@ -1,6 +1,6 @@
 const { Redis } = require('ioredis');
 const logger = require('../config/logger');
-const { REDIS_HOST, REDIS_PORT } = require('../config/settings');
+const { REDIS_URL } = require('../config/settings');
 
 let redis = null;
 let isConnecting = false;
@@ -13,10 +13,8 @@ const connectToRedis = () => {
     try {
         isConnecting = true;
 
-        redis = new Redis({
-            host: REDIS_HOST,
-            port: REDIS_PORT,
-            retryDelayOnFailover: 100,
+        redis = new Redis(REDIS_URL,{
+            retryDelayOnFailover: 1000,
             maxRetriesPerRequest: null,
             retryStrategy: (times) => {
                 const delay = Math.min(times * 50, 2000);

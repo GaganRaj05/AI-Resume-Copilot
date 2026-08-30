@@ -10,12 +10,10 @@ export default function CountUp({ value, suffix = "", prefix = "" }) {
   useEffect(() => {
     if (!inView) return;
     const controls = animate(0, numeric, {
-      duration: 1.4,
+      duration: 1.2,
       ease: [0.16, 1, 0.3, 1],
       onUpdate(v) {
-        setDisplay(
-          Number.isInteger(numeric) ? Math.round(v).toString() : v.toFixed(1),
-        );
+        setDisplay(Number.isInteger(numeric) ? Math.round(v).toString() : v.toFixed(1));
       },
     });
     return () => controls.stop();

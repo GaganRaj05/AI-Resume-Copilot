@@ -9,7 +9,7 @@ import {
   Sparkles,
   Loader2,
 } from "lucide-react";
-import "../../styles/Home.css";
+import "../../../Landing.css"; // adjust path — should point at the same Landing.css used by LandingPage.jsx
 
 const WaitlistPopup = ({ isOpen, onClose }) => {
   const [email, setEmail] = useState("");
@@ -92,14 +92,14 @@ const WaitlistPopup = ({ isOpen, onClose }) => {
   };
 
   const modalVariants = {
-    hidden: { opacity: 0, scale: 0.92, y: 20, transition: { duration: 0.25 } },
+    hidden: { opacity: 0, scale: 0.96, y: 16, transition: { duration: 0.25 } },
     visible: {
       opacity: 1,
       scale: 1,
       y: 0,
       transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
     },
-    exit: { opacity: 0, scale: 0.95, y: 10, transition: { duration: 0.25 } },
+    exit: { opacity: 0, scale: 0.97, y: 10, transition: { duration: 0.25 } },
   };
 
   const stepVariants = {
@@ -125,11 +125,7 @@ const WaitlistPopup = ({ isOpen, onClose }) => {
         animate="visible"
         exit="exit"
         variants={overlayVariants}
-        style={{
-          background: "rgba(6, 6, 16, 0.68)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-        }}
+        style={{ background: "rgba(10, 10, 11, 0.6)" }}
         onClick={onClose}
       >
         <motion.div
@@ -137,16 +133,13 @@ const WaitlistPopup = ({ isOpen, onClose }) => {
           variants={modalVariants}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Ambient glow behind the card, echoes hero/final-CTA glows */}
-          <div className="pointer-events-none absolute -top-10 left-1/2 h-40 w-64 -translate-x-1/2 rounded-full bg-[#6552E8] opacity-20 blur-3xl" />
-
-          <div className="acv-dotgrid relative overflow-hidden rounded-2xl border border-[var(--acv-border)] bg-[var(--acv-surface)] shadow-2xl">
-            {/* Close button */}
+          <div className="acv-dotgrid relative overflow-hidden rounded-[20px] border border-[var(--acv-border-soft)] bg-[var(--acv-surface)] shadow-[var(--acv-shadow-pop)]">
+            {/* Close button — same flat circular chip as the nav's theme toggle */}
             <button
               onClick={onClose}
-              className="absolute right-4 top-4 z-10 rounded-full p-1.5 text-[var(--acv-ink-faint)] transition-colors duration-200 hover:bg-[#17A34A]/10 hover:text-[#17A34A]"
+              className="acv-chip absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full text-[var(--acv-ink-soft)] transition hover:text-[var(--acv-ink)]"
             >
-              <X size={20} />
+              <X size={16} />
             </button>
 
             <div className="p-6 sm:p-8">
@@ -165,34 +158,32 @@ const WaitlistPopup = ({ isOpen, onClose }) => {
                         initial={{ scale: 0.85, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ duration: 0.35, delay: 0.05 }}
-                        className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-gradient-to-br from-[#6552E8] to-[#4B3DD1] shadow-[0_8px_20px_-6px_rgba(101,82,232,0.55)]"
+                        className="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-[var(--acv-ink)]"
                       >
                         <Search
-                          size={22}
-                          className="text-white"
-                          strokeWidth={1.75}
+                          size={20}
+                          className="text-[var(--acv-bg)]"
+                          strokeWidth={1.8}
                         />
                       </motion.div>
                       <div>
-                        <h3 className="acv-display text-xl font-semibold leading-tight text-[var(--acv-ink)]">
+                        <h3 className="acv-display text-[19px] uppercase leading-[1] text-[var(--acv-ink)] sm:text-[21px]">
                           We're updating our scrapers
                         </h3>
-                        <p className="text-sm text-[var(--acv-ink-faint)]">
+                        <p className="mt-0.5 text-[12.5px] text-[var(--acv-ink-faint)]">
                           Thanks for your interest in AgentCV
                         </p>
                       </div>
                     </div>
 
-                    {/* Mono status chip — echoes the hero's agent console */}
-                    <div className="acv-mono mb-5 inline-flex items-center gap-2 rounded-full border border-[#CA8A04]/25 bg-[#CA8A04]/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-[#A36A03]">
-                      <span className="relative flex h-1.5 w-1.5">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#CA8A04] opacity-60" />
-                        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#CA8A04]" />
-                      </span>
+                    {/* Status pill — same recipe as the hero badge: solid
+                        accent fill, pulsing dot, bold uppercase label */}
+                    <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-[var(--acv-accent)] px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wide text-white">
+                      <span className="acv-pulse-dot h-1.5 w-1.5 rounded-full bg-white" />
                       Scraper engine in progress
                     </div>
 
-                    <p className="mb-6 text-sm leading-relaxed text-[var(--acv-ink-soft)]">
+                    <p className="mb-6 text-[13.5px] leading-relaxed text-[var(--acv-ink-soft)]">
                       Our local job-board scrapers are still in the oven.
                       Drop your email and we'll let you know the moment
                       they're ready to run.
@@ -210,33 +201,17 @@ const WaitlistPopup = ({ isOpen, onClose }) => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="you@example.com"
-                            className="w-full rounded-xl border py-3 pl-10 pr-4 text-sm transition-colors duration-200 focus:outline-none"
+                            className="w-full rounded-xl border bg-[var(--acv-bg)] py-3 pl-10 pr-4 text-[13.5px] text-[var(--acv-ink)] transition-colors duration-200 focus:border-[var(--acv-ink)] focus:outline-none"
                             style={{
-                              backgroundColor: "var(--acv-bg)",
                               borderColor: error
-                                ? "#D1487A"
+                                ? "var(--acv-accent)"
                                 : "var(--acv-border)",
-                              color: "var(--acv-ink)",
                               fontFamily: "inherit",
-                            }}
-                            onFocus={(e) => {
-                              if (!error) {
-                                e.currentTarget.style.borderColor = "#17A34A";
-                                e.currentTarget.style.boxShadow =
-                                  "0 0 0 3px rgba(23, 163, 74, 0.12)";
-                              }
-                            }}
-                            onBlur={(e) => {
-                              if (!error) {
-                                e.currentTarget.style.borderColor =
-                                  "var(--acv-border)";
-                                e.currentTarget.style.boxShadow = "none";
-                              }
                             }}
                           />
                         </div>
                         {error && (
-                          <p className="mt-1.5 text-xs text-[#D1487A]">
+                          <p className="mt-1.5 text-[12px] text-[var(--acv-accent)]">
                             {error}
                           </p>
                         )}
@@ -245,18 +220,18 @@ const WaitlistPopup = ({ isOpen, onClose }) => {
                       <motion.button
                         type="submit"
                         disabled={isLoading}
-                        whileHover={!isLoading ? { y: -2, scale: 1.015 } : {}}
-                        whileTap={!isLoading ? { scale: 0.98 } : {}}
+                        whileHover={!isLoading ? { y: -2 } : {}}
+                        whileTap={!isLoading ? { scale: 0.97 } : {}}
                         transition={{
                           type: "spring",
-                          stiffness: 400,
-                          damping: 20,
+                          stiffness: 420,
+                          damping: 24,
                         }}
-                        className="acv-shine relative w-full overflow-hidden rounded-xl bg-[#17A34A] py-3 text-sm font-semibold text-white shadow-[0_8px_20px_-6px_rgba(23,163,74,0.55)] transition-colors hover:bg-[#128238] disabled:opacity-70"
+                        className="acv-shine relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-[var(--acv-ink)] py-3 text-[14px] font-semibold text-[var(--acv-bg)] transition-colors disabled:opacity-60"
                       >
                         {isLoading ? (
                           <span className="flex items-center justify-center gap-2">
-                            <Loader2 size={18} className="acv-spin" />
+                            <Loader2 size={16} className="animate-spin" />
                             Submitting...
                           </span>
                         ) : (
@@ -265,9 +240,9 @@ const WaitlistPopup = ({ isOpen, onClose }) => {
                       </motion.button>
                     </form>
 
-                    <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-[var(--acv-ink-faint)]">
+                    <p className="acv-mono mt-4 flex items-center justify-center gap-1.5 text-center text-[11px] uppercase tracking-wide text-[var(--acv-ink-faint)]">
                       <Lock size={12} strokeWidth={2} />
-                      No spam. Unsubscribe anytime.
+                      No spam · Unsubscribe anytime
                     </p>
                   </motion.div>
                 )}
@@ -292,33 +267,33 @@ const WaitlistPopup = ({ isOpen, onClose }) => {
                           damping: 16,
                           delay: 0.05,
                         }}
-                        className="acv-glow-tick mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#17A34A] to-[#128238]"
+                        className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--acv-border)] bg-[var(--acv-bg-flat)]"
                       >
                         <CheckCircle2
-                          size={30}
-                          className="text-white"
-                          strokeWidth={2}
+                          size={26}
+                          strokeWidth={1.9}
+                          style={{ color: "var(--acv-signal)" }}
                         />
                       </motion.div>
 
-                      <h3 className="acv-display mb-2 text-2xl font-semibold text-[var(--acv-ink)]">
+                      <h3 className="acv-display mb-2 text-[24px] uppercase leading-[0.98] text-[var(--acv-ink)]">
                         You're on the list
                       </h3>
 
-                      <p className="max-w-sm text-sm leading-relaxed text-[var(--acv-ink-soft)]">
+                      <p className="max-w-sm text-[13.5px] leading-relaxed text-[var(--acv-ink-soft)]">
                         Thanks for stopping by! We're still putting the
                         finishing touches on our scrapers to bring you an
                         even better experience. Stay tuned!
                       </p>
 
-                      <div className="mt-6 flex items-center gap-2 rounded-full bg-[#6552E8]/10 px-4 py-2 text-xs text-[#6552E8]">
-                        <Sparkles size={14} />
-                        <span>We'll email you the moment we're ready</span>
+                      <div className="acv-chip mt-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-[12px] text-[var(--acv-ink-soft)]">
+                        <Sparkles size={14} style={{ color: "var(--acv-signal)" }} />
+                        We'll email you the moment we're ready
                       </div>
 
                       <button
                         onClick={onClose}
-                        className="mt-6 rounded-xl bg-[#17A34A]/10 px-6 py-2.5 text-sm font-medium text-[#17A34A] transition-all duration-200 hover:bg-[#17A34A] hover:text-white"
+                        className="mt-6 rounded-full border border-[var(--acv-border-strong)] px-6 py-2.5 text-[13.5px] font-semibold text-[var(--acv-ink)] transition hover:bg-[var(--acv-ink)] hover:text-[var(--acv-bg)]"
                       >
                         Got it, thanks!
                       </button>
@@ -328,15 +303,9 @@ const WaitlistPopup = ({ isOpen, onClose }) => {
               </AnimatePresence>
             </div>
 
-            {/* Subtle accent bar at bottom */}
-            <div
-              className="h-1"
-              style={{
-                background:
-                  "linear-gradient(90deg, #17A34A, #6552E8, #8B5CF6)",
-                backgroundSize: "200% auto",
-              }}
-            />
+            {/* Flat single-color accent bar — same weight/color as the
+                page's scroll-progress bar, no gradient */}
+            <div className="h-[3px] bg-[var(--acv-accent)]" />
           </div>
         </motion.div>
       </motion.div>

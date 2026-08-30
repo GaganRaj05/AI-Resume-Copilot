@@ -1,10 +1,8 @@
 
-export default function SectionEyebrow({ children, index }) {
+export default function SectionEyebrow({ children }) {
   return (
-    <div className="inline-flex items-center justify-center gap-2.5">
-      <p className="inline-flex items-center gap-1.5 text-[12.5px] font-bold uppercase tracking-wider text-[#6552E8]">
-        {children}
-      </p>
-    </div>
+    <span className="acv-chip acv-mono inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--acv-ink-soft)]">
+      {children}
+    </span>
   );
 }

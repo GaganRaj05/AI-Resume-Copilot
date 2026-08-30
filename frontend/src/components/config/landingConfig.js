@@ -25,19 +25,24 @@ import {
   Cloud,
   Zap,
   Orbit, 
-  BadgeCheck
+  KeyRound,
+  EyeOff,
+  GitFork,
+  ShieldCheck
 } from "lucide-react";
 
 const BRAND = "AgentCV";
 const OS_LABEL = "Windows";
 
 const NAV_LINKS = [
-  { label: "How it Works", id: "how-it-works" },
-  { label: "Why AgentCV", id: "why-different" },
-  { label: "Features", id: "features" },
-  { label: "Reviews", id: "reviews" },
-  { label: "FAQ", id: "faq" },
+  { label: "How it Works", href: "how-it-works" },
+  { label: "Trust", href: "trust" },
+  { label: "Why Local", href: "why-local" },
+  { label: "Features", href: "features" },
+  { label: "Reviews", href: "reviews" },
 ];
+
+
 
 const HERO_BULLETS = [
   { icon: BrainCircuit, title: "Understands you & the job" },
@@ -69,6 +74,33 @@ const COMPANIES = [
   { name: "Anchorwell", icon: Anchor, color: "#2563EB" },
   { name: "Featherlight", icon: Feather, color: "#DB2777" },
 ];
+const TRUST_POINTS = [
+  {
+    icon: KeyRound,
+    title: "End-to-end encryption",
+    detail: "Resumes, cover letters, and job history stay encrypted at rest, on your disk.",
+    status: "Enabled",
+  },
+  {
+    icon: EyeOff,
+    title: "Zero telemetry",
+    detail: "No usage analytics, no crash reports, nothing phoned home in the background.",
+    status: "Off",
+  },
+  {
+    icon: GitFork,
+    title: "Open source",
+    detail: "The full tailoring engine is public on GitFork — audit it line by line.",
+    status: "Public",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Granular permissions",
+    detail: "AgentCV asks before it reads a file, opens a tab, or submits a form.",
+    status: "You approve",
+  },
+];
+
 
 const STATUS_STEPS = [
   { label: "Analyzing Background", done: true },
@@ -163,36 +195,26 @@ const COMPARISON_ROWS = [
   },
 ];
 
-const FEATURE_STRIP = [
+const FEATURES = [
   {
     icon: Sparkles,
-    title: "AI-Powered Agent",
-    body: "Works independently to understand your background and tailor your resume.",
-  },
-  {
-    icon: Search,
-    title: "Local Job Scraper",
-    body: "Checks job boards every day at 9am, or on demand whenever you trigger it.",
+    title: "AI-powered agent",
+    body: "Understands your background once, then tailors every match on its own.",
   },
   {
     icon: Target,
-    title: "Role-Specific Tailoring",
-    body: "Highlights the right skills and experience for every job it finds.",
+    title: "Role-specific tailoring",
+    body: "Surfaces the right skills and experience for each posting it finds.",
   },
   {
     icon: Layers,
-    title: "Structured Resume Vault",
-    body: "Every tailored version saved and organized by role, ready to export.",
+    title: "Structured resume vault",
+    body: "Every version saved and organized by company, ready to export.",
   },
   {
     icon: Lock,
-    title: "Private by Design",
-    body: "Your data and API calls never leave your machine.",
-  },
-  {
-    icon: BadgeCheck,
-    title: "ATS Score & Overleaf Formatting",
-    body: "Every tailored resume gets an ATS compatibility score and is built on an Overleaf-style LaTeX template, then saved as a PDF in your vault under a folder named for the company.",
+    title: "Private by design",
+    body: "Your data and API calls never leave your machine — no exceptions.",
   },
 ];
 
@@ -308,4 +330,10 @@ const TICKER_ITEMS = [
   "Your Data Never Leaves Your Machine",
 ];
 
-export {BRAND, OS_LABEL, NAV_LINKS, TICKER_ITEMS, FOOTER_COLUMNS, FAQ_ITEMS, REVIEWS, FEATURE_STRIP, COMPARISON_ROWS, HOW_IT_WORKS, PROBLEM_POINTS, COMPANIES, STATUS_STEPS, TRUST_ROW, HERO_BULLETS }
+const STAT_HIGHLIGHTS = [
+  { value: "9", suffix: "am", label: "boards scraped, daily" },
+  { value: "0", suffix: "", label: "requests sent off-device" },
+  { value: "0", suffix: "/mo", label: "cost, ever" },
+  { value: "100", suffix: "%", label: "tailoring done locally" },
+];
+export {TRUST_POINTS,STAT_HIGHLIGHTS,BRAND, OS_LABEL, NAV_LINKS, TICKER_ITEMS, FOOTER_COLUMNS, FAQ_ITEMS, REVIEWS, FEATURES, COMPARISON_ROWS, HOW_IT_WORKS, PROBLEM_POINTS, COMPANIES, STATUS_STEPS, TRUST_ROW, HERO_BULLETS }

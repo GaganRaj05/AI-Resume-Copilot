@@ -1,49 +1,67 @@
 import { motion } from 'framer-motion';
 import { Reveal, SectionEyebrow } from '../ui';
-import { FEATURE_STRIP } from '../config/landingConfig';
+import { FEATURES } from '../config/landingConfig';
+
+
+function StaggerGrid({ children, className = "" }) {
+  return (
+    <motion.div
+      variants={staggerContainer}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.15 }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+const staggerContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.04 } },
+};
+const staggerItem = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
+};
+
 
 export default function FeatureStrip() {
   return (
-    <section id="features" className="bg-[var(--acv-surface)] py-20">
-      <div className="mx-auto max-w-7xl px-6 lg:px-10">
-        <Reveal className="mx-auto max-w-2xl text-center">
-          <SectionEyebrow index="04">Features</SectionEyebrow>
-          <h2 className="acv-display mt-4 text-[32px] font-bold leading-tight text-[var(--acv-ink)] sm:text-[38px]">
-            Everything the agent handles{" "}
-            <span className="acv-serif bg-gradient-to-r from-[#6552E8] to-[#8B5CF6] bg-clip-text text-transparent">
-              for you
-            </span>
-          </h2>
-        </Reveal>
+    <section id="features" className="mx-auto max-w-7xl px-6 py-20 lg:px-10">
+      <Reveal className="mx-auto max-w-xl text-center">
+        <SectionEyebrow>Features</SectionEyebrow>
+        <h2 className="acv-display mt-4 text-[34px] uppercase leading-[0.98] text-[var(--acv-ink)] sm:text-[42px]">
+          Everything it does, on its own
+        </h2>
+      </Reveal>
 
-        <div className="mt-12 grid gap-6 rounded-3xl border border-[var(--acv-border)] bg-[var(--acv-surface-alt)] p-8 sm:grid-cols-2 lg:grid-cols-3 lg:p-10">
-          {FEATURE_STRIP.map((item, i) => (
-            <Reveal key={item.title} delay={i * 0.06}>
+      <StaggerGrid className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {FEATURES.map((feature) => (
+          <motion.div key={feature.title} variants={staggerItem}>
+            <motion.div
+              whileHover={{ y: -4 }}
+              transition={{ type: "spring", stiffness: 320, damping: 22 }}
+              className="acv-panel h-full rounded-[20px] p-6"
+            >
               <motion.div
-                whileHover={{ y: -3 }}
-                className="group flex flex-col items-start gap-3"
+                whileHover={{ rotate: -6, scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 300, damping: 18 }}
+                className="flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--acv-border)]"
               >
-                <motion.div
-                  whileHover={{ rotate: -8, scale: 1.08 }}
-                  transition={{ type: "spring", stiffness: 350, damping: 15 }}
-                  className="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--acv-surface)] shadow-sm"
-                >
-                  <item.icon
-                    className="h-5 w-5 text-[#6552E8]"
-                    strokeWidth={2}
-                  />
-                </motion.div>
-                <p className="text-[14.5px] font-bold text-[var(--acv-ink)]">
-                  {item.title}
-                </p>
-                <p className="text-[13px] leading-relaxed text-[var(--acv-ink-soft)]">
-                  {item.body}
-                </p>
+                <feature.icon className="h-[19px] w-[19px] text-[var(--acv-ink)]" strokeWidth={1.8} />
               </motion.div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
+              <p className="mt-4 text-[14.5px] font-semibold text-[var(--acv-ink)]">
+                {feature.title}
+              </p>
+              <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--acv-ink-soft)]">
+                {feature.body}
+              </p>
+            </motion.div>
+          </motion.div>
+        ))}
+      </StaggerGrid>
     </section>
   );
 }

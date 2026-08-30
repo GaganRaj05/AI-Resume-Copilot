@@ -2,3 +2,5 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prevent any component from expanding the page horizontally */
+
